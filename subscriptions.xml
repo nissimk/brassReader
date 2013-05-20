@@ -1,0 +1,221 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<opml version="1.0">
+    <head>
+        <title>nissim subscriptions in Google Reader</title>
+    </head>
+    <body>
+        <outline title="Finance2" text="Finance2">
+            <outline text="Clusterstock" title="Clusterstock" type="rss"
+                xmlUrl="http://feeds.feedburner.com/clusterstock?format=xml" htmlUrl="http://www.businessinsider.com/clusterstock"/>
+            <outline text="Financetech - All Stories"
+                title="Financetech - All Stories" type="rss"
+                xmlUrl="http://www.financetech.com/rss/all.jhtml" htmlUrl="http://www.wallstreetandtech.com"/>
+            <outline text="Minyanville" title="Minyanville" type="rss"
+                xmlUrl="http://www.minyanville.com/rss/minyanfeed.php" htmlUrl="http://www.minyanville.com"/>
+            <outline text="WSJ.com: MarketBeat Blog - WSJ.com"
+                title="WSJ.com: MarketBeat Blog - WSJ.com" type="rss"
+                xmlUrl="http://blogs.wsj.com/marketbeat/feed/" htmlUrl="http://blogs.wsj.com/marketbeat"/>
+        </outline>
+        <outline text="3D Printers" title="3D Printers" type="rss"
+            xmlUrl="http://3dprinters.blogspot.com/feeds/posts/default" htmlUrl="http://3dprinters.blogspot.com/"/>
+        <outline title="Green Energy" text="Green Energy">
+            <outline
+                text="Alternative Energy : Best Green Blogs Directory"
+                title="Alternative Energy : Best Green Blogs Directory"
+                type="rss" xmlUrl="http://www.bestgreenblogs.com/feed/" htmlUrl="http://www.bestgreenblogs.com"/>
+            <outline text="Alternative Energy Headlines"
+                title="Alternative Energy Headlines" type="rss"
+                xmlUrl="http://feeds.feedburner.com/RenewableEnergyHeadlines" htmlUrl="http://www.alternative-energy-news.info/headlines/"/>
+            <outline
+                text="Alternative Energy Stocks: The Investor Resource for Alternative ..."
+                title="Alternative Energy Stocks: The Investor Resource for Alternative ..."
+                type="rss"
+                xmlUrl="http://www.altenergystocks.com/atom.xml" htmlUrl="http://www.altenergystocks.com/"/>
+            <outline text="Alternative Energy | GreenBiz.com"
+                title="Alternative Energy | GreenBiz.com" type="rss"
+                xmlUrl="http://feeds.feedburner.com/greenbuzz" htmlUrl="http://www.greenbiz.com/feed/greenbiz"/>
+            <outline text="Inhabitat » ALTERNATIVE ENERGY: Rain Power"
+                title="Inhabitat » ALTERNATIVE ENERGY: Rain Power"
+                type="rss"
+                xmlUrl="http://feeds.feedburner.com/Inhabitat" htmlUrl="http://inhabitat.com"/>
+            <outline
+                text="Mapping the Alternative Energy Potential of the United States ..."
+                title="Mapping the Alternative Energy Potential of the United States ..."
+                type="rss" xmlUrl="http://www.treehugger.com/atom.xml" htmlUrl="http://www.treehugger.com/feeds/latest/"/>
+            <outline
+                text="Posts from the Alternative Energy Category at Green Daily"
+                title="Posts from the Alternative Energy Category at Green Daily"
+                type="rss" xmlUrl="http://www.greendaily.com/rss.xml" htmlUrl="http://www.greendaily.com"/>
+        </outline>
+        <outline title="Geeky" text="Geeky">
+            <outline text="Cool Tools" title="Cool Tools" type="rss"
+                xmlUrl="http://feeds.feedburner.com/CoolTools" htmlUrl="http://kk.org/cooltools"/>
+            <outline text="Instructables: exploring"
+                title="Instructables: exploring" type="rss"
+                xmlUrl="http://www.instructables.com/tag/type:instructable/rss.xml" htmlUrl="http://www.instructables.com"/>
+            <outline text="MAKE Magazine" title="MAKE Magazine"
+                type="rss"
+                xmlUrl="http://www.makezine.com/blog/index.xml" htmlUrl="http://blog.makezine.com"/>
+        </outline>
+        <outline title="Mets" text="Mets">
+            <outline
+                text="*Faith* and *Fear* in *Flushing* :: Main Page"
+                title="*Faith* and *Fear* in *Flushing* :: Main Page"
+                type="rss"
+                xmlUrl="http://faithandfear.blogharbor.com/blog/index.xml" htmlUrl="http://www.faithandfearinflushing.com"/>
+            <outline text="*Hot Foot*" title="*Hot Foot*" type="rss"
+                xmlUrl="http://www.hotfootblog.com/feed/" htmlUrl="http://www.hotfootblog.com"/>
+            <outline text="*Mets* Fever" title="*Mets* Fever" type="rss"
+                xmlUrl="http://metsfever.blogspot.com/feeds/posts/default" htmlUrl="http://www.metsfever.com/"/>
+            <outline
+                text="*Mets* Merized Online - Get Metsmerized - *New York Mets*"
+                title="*Mets* Merized Online - Get Metsmerized - *New York Mets*"
+                type="rss"
+                xmlUrl="http://metsmerizedonline.com/atom.xml" htmlUrl="http://metsmerizedonline.com/"/>
+            <outline text="*Mets* Refugees" title="*Mets* Refugees"
+                type="rss" xmlUrl="http://www.metsrefugees.com/feed/" htmlUrl="http://www.metsrefugees.com"/>
+            <outline text="*Mets* Today" title="*Mets* Today" type="rss"
+                xmlUrl="http://feeds.feedburner.com/metstoday" htmlUrl="http://www.metstoday.com"/>
+            <outline text="*Mike's Mets*" title="*Mike's Mets*"
+                type="rss" xmlUrl="http://www.mikesmets.com/atom.xml" htmlUrl="http://www.mikesmets.com/"/>
+            <outline text="*Shea Nation*" title="*Shea Nation*"
+                type="rss"
+                xmlUrl="http://sheanation.blogspot.com/feeds/posts/default" htmlUrl="http://sheanation.blogspot.com/"/>
+            <outline text="Mets Geek" title="Mets Geek" type="rss"
+                xmlUrl="http://feeds.feedburner.com/metsgeek" htmlUrl="http://www.metsgeek.com"/>
+            <outline text="MetsBlog.com" title="MetsBlog.com" type="rss"
+                xmlUrl="http://www.metsblog.com/feed/" htmlUrl="http://metsblog.com"/>
+            <outline
+                text="Take the 7 Train | MVN - a *New York Mets* blog » Blog Archive *...*"
+                title="Take the 7 Train | MVN - a *New York Mets* blog » Blog Archive *...*"
+                type="rss" xmlUrl="http://mvn.com/mlb-mets/feed/" htmlUrl="http://mvn.com"/>
+            <outline text="The Musings and Prophecies of Metstradamus"
+                title="The Musings and Prophecies of Metstradamus"
+                type="rss"
+                xmlUrl="http://metstradamus.blogspot.com/feeds/posts/default" htmlUrl="http://metstradamus.blogspot.com/"/>
+        </outline>
+        <outline title="h" text="h">
+            <outline text="Hacker News" title="Hacker News" type="rss"
+                xmlUrl="http://news.ycombinator.com/rss" htmlUrl="https://news.ycombinator.com/"/>
+            <outline text="Lifehacker" title="Lifehacker" type="rss"
+                xmlUrl="http://lifehacker.com/index.xml" htmlUrl="http://lifehacker.com"/>
+            <outline text="Slashdot" title="Slashdot" type="rss"
+                xmlUrl="http://slashdot.org/index.rss" htmlUrl="http://slashdot.org/"/>
+            <outline
+                text="TorrentFreak | Torrent News, Torrent Sites and the latest Scoops"
+                title="TorrentFreak | Torrent News, Torrent Sites and the latest Scoops"
+                type="rss"
+                xmlUrl="http://feeds.feedburner.com/Torrentfreak" htmlUrl="http://torrentfreak.com"/>
+        </outline>
+        <outline title="FinanceTech" text="FinanceTech">
+            <outline text="Empirical Finance Research Blog"
+                title="Empirical Finance Research Blog" type="rss"
+                xmlUrl="http://empiricalfinanceresearch.blogspot.com/feeds/posts/default" htmlUrl="http://empiricalfinanceresearch.blogspot.com/"/>
+            <outline text="Information Arbitrage"
+                title="Information Arbitrage" type="rss"
+                xmlUrl="http://www.informationarbitrage.com/atom.xml" htmlUrl="http://informationarbitrage.com/"/>
+            <outline text="Max Dama on Automated Trading"
+                title="Max Dama on Automated Trading" type="rss"
+                xmlUrl="http://www.maxdama.com/feeds/posts/default" htmlUrl="http://maxdama.blogspot.com/"/>
+            <outline text="Quantitative Trading"
+                title="Quantitative Trading" type="rss"
+                xmlUrl="http://epchan.blogspot.com/feeds/posts/default" htmlUrl="http://epchan.blogspot.com/"/>
+            <outline text="Wall Street &amp; Technology: Blog"
+                title="Wall Street &amp; Technology: Blog" type="rss"
+                xmlUrl="http://www.wallstreetandtech.com/blog/movabletype/index.xml;jsessionid=53LZT4OEGLBE2QSNDLPSKH0CJUNN2JVN" htmlUrl="http://www.wallstreetandtech.com"/>
+        </outline>
+        <outline title="Twitter" text="Twitter">
+            <outline text="genetic algorithm - Twitter Search"
+                title="genetic algorithm - Twitter Search" type="rss"
+                xmlUrl="http://search.twitter.com/search.atom?lang=en&amp;q=+genetic+algorithm" htmlUrl="http://search.twitter.com/search?q=genetic+algorithm"/>
+            <outline text="hadoop - Twitter Search"
+                title="hadoop - Twitter Search" type="rss"
+                xmlUrl="http://search.twitter.com/search.atom?lang=en&amp;q=+hadoop" htmlUrl="http://search.twitter.com/search?q=hadoop"/>
+        </outline>
+        <outline title="Technology" text="Technology">
+            <outline text="Engadget" title="Engadget" type="rss"
+                xmlUrl="http://www.engadget.com/rss.xml" htmlUrl="http://www.engadget.com"/>
+            <outline text="Gizmodo" title="Gizmodo" type="rss"
+                xmlUrl="http://feeds.gawker.com/gizmodo/full" htmlUrl="http://gizmodo.com"/>
+            <outline text="TechCrunch" title="TechCrunch" type="rss"
+                xmlUrl="http://feeds.feedburner.com/Techcrunch" htmlUrl="http://techcrunch.com"/>
+            <outline text="Wired: Top Stories"
+                title="Wired: Top Stories" type="rss"
+                xmlUrl="http://www.wired.com/news/feeds/rss2/0,2610,,00.xml" htmlUrl="http://www.wired.com"/>
+        </outline>
+        <outline title="housing-credit-econ" text="housing-credit-econ">
+            <outline text="- Housing Doom" title="- Housing Doom"
+                type="rss" xmlUrl="http://housingdoom.com/feed/" htmlUrl="https://housingdoom.com"/>
+            <outline text="Accrued Interest" title="Accrued Interest"
+                type="rss"
+                xmlUrl="http://accruedint.blogspot.com/feeds/posts/default" htmlUrl="http://accruedint.blogspot.com/"/>
+            <outline text="Calculated Risk" title="Calculated Risk"
+                type="rss"
+                xmlUrl="http://calculatedrisk.blogspot.com/atom.xml" htmlUrl="http://www.calculatedriskblog.com/"/>
+            <outline text="Credit Bubble Stocks"
+                title="Credit Bubble Stocks" type="rss"
+                xmlUrl="http://www.creditbubblestocks.com/feeds/posts/default" htmlUrl="http://www.creditbubblestocks.com/"/>
+            <outline text="Credit Slips" title="Credit Slips" type="rss"
+                xmlUrl="http://www.creditslips.org/creditslips/atom.xml" htmlUrl="http://www.creditslips.org/creditslips/"/>
+            <outline text="Doctor Housing Bubble Blog"
+                title="Doctor Housing Bubble Blog" type="rss"
+                xmlUrl="http://drhousingbubble.blogspot.com/feeds/posts/default" htmlUrl="http://www.doctorhousingbubble.com"/>
+            <outline text="Financial Armageddon"
+                title="Financial Armageddon" type="rss"
+                xmlUrl="http://feeds.feedburner.com/financialarmageddon" htmlUrl="http://www.financialarmageddon.com/"/>
+            <outline text="Housing Chronicles"
+                title="Housing Chronicles" type="rss"
+                xmlUrl="http://www.housingchronicles.com/feeds/posts/default" htmlUrl="http://www.housingchronicles.com/"/>
+            <outline text="HOUSING DERIVATIVES"
+                title="HOUSING DERIVATIVES" type="rss"
+                xmlUrl="http://housingderivatives.typepad.com/housing_derivatives/atom.xml" htmlUrl="http://housingderivatives.typepad.com/housing_derivatives/"/>
+            <outline text="Jeff Matthews Is Not Making This Up"
+                title="Jeff Matthews Is Not Making This Up" type="rss"
+                xmlUrl="http://jeffmatthewsisnotmakingthisup.blogspot.com/atom.xml" htmlUrl="http://jeffmatthewsisnotmakingthisup.blogspot.com/"/>
+            <outline text="Loan Modification &amp; Loan Workout News"
+                title="Loan Modification &amp; Loan Workout News"
+                type="rss" xmlUrl="http://loanworkout.org/atom.aspx" htmlUrl="http://loanworkout.org/"/>
+            <outline text="MarketSci Blog" title="MarketSci Blog"
+                type="rss" xmlUrl="http://marketsci.wordpress.com/feed/" htmlUrl="http://marketsci.wordpress.com"/>
+            <outline text="Mish's Global Economic Trend Analysis"
+                title="Mish's Global Economic Trend Analysis" type="rss"
+                xmlUrl="http://feeds.feedburner.com/MishsGlobalEconomicTrendAnalysis" htmlUrl="http://globaleconomicanalysis.blogspot.com/"/>
+            <outline text="naked capitalism" title="naked capitalism"
+                type="rss"
+                xmlUrl="http://www.nakedcapitalism.com/feeds/posts/default" htmlUrl="http://www.nakedcapitalism.com"/>
+            <outline
+                text="RGE Monitor : Nouriel Roubini's Global EconoMonitor"
+                title="RGE Monitor : Nouriel Roubini's Global EconoMonitor"
+                type="rss"
+                xmlUrl="http://www.rgemonitor.com/feeds/mamblog_rss.php?componentid=136" htmlUrl="http://www.roubini.com/roubini-monitor"/>
+            <outline text="Sudden Debt" title="Sudden Debt" type="rss"
+                xmlUrl="http://suddendebt.blogspot.com/feeds/posts/default" htmlUrl="http://suddendebt.blogspot.com/"/>
+            <outline text="The Big Picture | How SubPrime Really Works"
+                title="The Big Picture | How SubPrime Really Works"
+                type="rss"
+                xmlUrl="http://bigpicture.typepad.com/comments/atom.xml" htmlUrl="http://www.ritholtz.com/blog"/>
+            <outline text="The Bonddad Blog" title="The Bonddad Blog"
+                type="rss"
+                xmlUrl="http://bonddad.blogspot.com/feeds/posts/default" htmlUrl="http://bonddad.blogspot.com/"/>
+            <outline text="The Great Loan Blog"
+                title="The Great Loan Blog" type="rss"
+                xmlUrl="http://thegreatloanblog.blogspot.com/feeds/posts/default?alt=rss" htmlUrl="http://thegreatloanblog.blogspot.com/"/>
+            <outline text="The Housing Bubble Blog"
+                title="The Housing Bubble Blog" type="rss"
+                xmlUrl="http://thehousingbubbleblog.com/?feed=rss2" htmlUrl="http://thehousingbubbleblog.com"/>
+            <outline text="The IRA Analyst" title="The IRA Analyst"
+                type="rss"
+                xmlUrl="http://us1.institutionalriskanalytics.com/rss/ira_rss.asp" htmlUrl="http://www.institutionalriskanalytics.com"/>
+            <outline text="Ticker Sense" title="Ticker Sense" type="rss"
+                xmlUrl="http://tickersense.typepad.com/ticker_sense/atom.xml" htmlUrl="http://tickersense.typepad.com/ticker_sense/"/>
+            <outline text="VoxEU.org: Recent Articles"
+                title="VoxEU.org: Recent Articles" type="rss"
+                xmlUrl="http://www.voxeu.org/rss.php?q=recent" htmlUrl="http://www.VoxEU.org"/>
+            <outline
+                text="zero hedge - on a long enough timeline, the survival rate for everyone drops to zero"
+                title="zero hedge - on a long enough timeline, the survival rate for everyone drops to zero"
+                type="rss"
+                xmlUrl="http://feeds.feedburner.com/zerohedge/feed" htmlUrl="http://www.zerohedge.com/fullrss2.xml"/>
+        </outline>
+    </body>
+</opml>

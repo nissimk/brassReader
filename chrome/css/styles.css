@@ -1,0 +1,71 @@
+body {
+  hieght: 100%;
+  overflow: hidden;
+}
+
+.left-section, .right-section {
+  height: 100%;
+  overflow: auto;
+}
+
+.left-section a, .left-section a:hover, .left-section a:link, .left-section a:visited, .left-section .divlink {
+  color: #000;
+  text-decoration: none;
+  display: inline;
+}
+
+.header-text {
+  margin-left: 65px;
+  margin-top: 18px;
+}
+
+.header-star {
+  float: left;
+  width: 54px;
+  height: 54px;
+}
+
+.right-buttons {
+  margin-top: 20px;
+}
+
+.divlink {
+  cursor: pointer;
+}
+
+table.itemsTable {
+  table-layout: fixed;
+}
+
+tr.item {
+  cursor: pointer;
+}
+
+td.itemTitleDesc {
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+div.itemTitleUnread {
+  float: left;
+  font-weight: bold;
+}
+
+div.itemTitleRead {
+  float: left;
+  font-weight: normal;
+}
+
+td.itemFeedName {
+  width: 100px;
+  overflow: hidden;
+}
+
+td.itemDateTime {
+  width: 85px;
+  text-align: right;
+}
+
+div.itemContent {
+  max-width: 650px;
+}

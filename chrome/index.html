@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <title>Reader</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css"/>
+    <link rel="stylesheet" type="text/css" href="css/styles.css"/>
+    <link rel="stylesheet" href="font-awesome/css/font-awesome.min.css">
+    <link rel="icon" type="image/ico" href="img/star_16.ico">
+</head>
+<body>
+    <script src="js/jquery-1.9.1.min.js"></script>
+    <script src="js/jquery.jfeed.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <script src="js/readerUtils.js"></script>
+    <script src="js/reader.js"></script>
+    <script src="js/readerFeed.js"></script>
+    <div class="container-fluid">
+      <div class="row-fluid" id="top-nav">
+        <div class="span3">
+          <img src="img/star.png" class="header-star"></img>
+          <h4 class="header-text">Brass Reader</h4>
+        </div>
+        <div class="span9 right-buttons">
+          <a class="btn" id="btnRefresh"><i class="icon-refresh"></i></a>
+          <div class="btn-group">
+            <a class="btn dropdown-toggle" data-toggle="dropdown" id="btnShowReadItems">All Items <span class="icon-caret-down"></span></a>
+            <ul class="dropdown-menu">
+              <li><a href="#" id="mnuAllItems">All Items</a></li>
+              <li><a href="#" id="mnuUnreadItems">Unread Items</a></li>
+            </ul>
+          </div>
+          <a class="btn" id="btnMarkAllRead">Mark all read</a>
+        </div>
+      </div>
+      <div class="row-fluid">
+        <div class="span3 left-section" id="left-section">
+          <!--Sidebar content-->
+          <form name="frmSidebar">
+            <div class="btn-group">
+              <a class="btn" href="#" title="Add Feed" data-toggle="modal" data-target="#modalAddFeed"><i class="icon-rss"></i></a>
+              <a class="btn" href="#" title="Add Folder"><i class="icon-folder-close"></i></a>
+              <a class="btn" href="#" title="Import feeds from Google Reader" data-toggle="modal" data-target="#modalImportOpml">
+                <i class="icon-cloud-download"></i></a>
+              <a class="btn" href="#" title="Import OPML" data-toggle="modal" data-target="#modalImportOpml"><i class="icon-briefcase"></i></a>
+            </div>
+          </form>
+          <ul class="nav nav-list" id="feedList">
+          </ul>
+        </div>
+        <div class="span9 right-section" id="right-section">
+          <!--Body content-->
+          <table class="table table-condensed itemsTable" id="storyList">
+          </table>
+        </div>
+      </div>
+    </div>
+    <div class="modal hide fade" id="modalAddFeed">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h3>Add Feed</h3>
+      </div>
+      <div class="modal-body">
+        <p>Paste feed URL here</p>
+        <form name="frmNewFeed">
+          <input type="text" id="txtNewFeed"></input>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <a href="#" class="btn" data-dismiss="modal">Cancel</a>
+        <a href="#" class="btn btn-primary" id="btnSaveFeed">Save changes</a>
+      </div>
+    </div>
+    <div class="modal hide fade" id="modalImportOpml">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h3>Import OPML</h3>
+      </div>
+      <div class="modal-body">
+        <p>Seleect File:</p>
+        <form name="frmNewFeed">
+          <input type="file" id="txtOpmlFile"></input>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <a href="#" class="btn" id="btnCancelAddFeed" data-dismiss="modal">Cancel</a>
+        <a href="#" class="btn btn-primary" id="btnImportOpml">Import</a>
+      </div>
+    </div>
+</body>
+

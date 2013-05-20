@@ -1,0 +1,34 @@
+* Fix date formatting of updated in displayFeed
+* Write function to display first n characters of description When showing it in the item list
+* make left hand items links and implement event
+* Add functions to item when loading it from the db
+* Expand item -- make right hand items links and implement event
+*  -make links blue again in right table.. only black in left list
+*  -show h3 with link in item td
+*  -control content width in item td
+*  -highlight open row with class
+*  -use class to denote read vs unread items bold and unbold
+* import opml
+*  -include fontawesome
+*  -change button to 3 buttons -- add feed, add folder and import opml
+* display feed folder  -- only display feed title in folder view -- in single feed view omit the feed name from each item.
+* open/close folder
+* timer to get feeds  -- 
+right side buttons:
+  -display all or just unread
+  -mark all read
+  -sort newest / oldest
+  -feed settings show menu from item list
+* reclick feed / folder when already in it
+import feedlist from reader API
+feedlist menus:
+  feed:
+    move to folder >
+    mark all read
+    unsubscribe
+    sort by newest
+    sort by oldesd
+  folder: 
+    mark all read
+import zip expand and extract opml
+
