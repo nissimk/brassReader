@@ -14,13 +14,19 @@
 * display feed folder  -- only display feed title in folder view -- in single feed view omit the feed name from each item.
 * open/close folder
 * timer to get feeds  -- 
+import feedlist from reader API
+display only first n items, display more when scrolling
+folder unread count
+  - add folder to feed.
+  - add unread to folder object in tree
 right side buttons:
-  -display all or just unread
-  -mark all read
+*  -display all or just unread
+*  -mark all read
   -sort newest / oldest
   -feed settings show menu from item list
 * reclick feed / folder when already in it
-import feedlist from reader API
+better error handling on feed import
+throttling of feed querying
 feedlist menus:
   feed:
     move to folder >
@@ -30,5 +36,4 @@ feedlist menus:
     sort by oldesd
   folder: 
     mark all read
-import zip expand and extract opml
 

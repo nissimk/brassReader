@@ -3,7 +3,7 @@ function ReaderFeedList() {
   this.tree = [];  //items will either be url or {name: <folder name>, items: [list of feed urls in folder], isOpen: T/F}
   this.feeds = {}; // keys are url; items are readerFeed
   this.ids = {};  //keys are url or folder name; value is string with html id of element in list
-  this.timer = null;
+  this.timeout = null;
   this.isShowReadItems = true;
 }
 
@@ -15,6 +15,7 @@ ReaderFeedList.prototype = {
       var cursor = event.target.result;
       if (cursor) {
         var val = cursor.value;
+        that.isShowReadItems = val.isShowReadItems;
         that.tree = val.tree;
         var feeds = that.feeds;
         $.each(val.feeds, function(i, url) {
@@ -27,6 +28,14 @@ ReaderFeedList.prototype = {
       }
     };
   },
+  addFeedForImport: function(url, oldFeeds) {
+    if (url in oldFeeds) {
+      this.feeds[url] = oldFeeds[url];
+    } else {
+      this.feeds[url] = null;
+    }
+    return url;
+  },
   loadFromOPML: function(opml) {
     //right now this will blow away the list and replace by the OPML
     //later add an option to merge
@@ -35,23 +44,14 @@ ReaderFeedList.prototype = {
     this.feeds = {};
     this.ids = {};
     var that = this;
-    var addFeed = function(node) {
-      var url = node.attributes.xmlUrl.value;
-      if (url in oldFeeds) {
-        that.feeds[url] = oldFeeds[url];
-      } else {
-        that.feeds[url] = null;
-      }
-      return url;
-    };
     $.each($("body > outline", opml), function(i, val) {
       if (val.childNodes.length === 0) {
-        that.tree.push(addFeed(val));
+        that.tree.push(that.addFeedForImport(val.attributes.xmlUrl.value, oldFeeds));
       } else {
         var folder = {name: val.attributes.title.value, isOpen: true, items: []};
         $.each(val.childNodes, function(j, val2) {
           if (val2.attributes !== null) {
-            folder.items.push(addFeed(val2));
+            folder.items.push(that.addFeedForImport(val2.attributes.xmlUrl.value, oldFeeds));
           }
         });
         that.tree.push(folder);
@@ -59,6 +59,41 @@ ReaderFeedList.prototype = {
     });
     this.saveToStorage();
     this.displayList(function() { that.updateAllFeeds(); });
+  },
+  getFolder: function(fld) {
+    var folder = null;
+    $.each(this.tree, function(i, val) {
+      if ($.isPlainObject(val) && val.name == fld)
+        folder = val;
+    });
+    return folder;
+  }, 
+  importGReader: function() {
+    var oldFeeds = this.feeds;
+    this.tree = [];
+    this.feeds = {};
+    this.ids = {};
+    var that = this;
+    $.get("http://www.google.com/reader/api/0/subscription/list?output=json", function(data) {
+      console.log(data);
+      $.each(data.subscriptions, function(i, val) {
+        var url = that.addFeedForImport(val.id.substr(5), oldFeeds);
+        if (val.categories.length) {
+          var folder = that.getFolder(val.categories[0].label);
+          if (folder == null)
+          {
+            folder = {name: val.categories[0].label, items: [], isOpen: true};
+            that.tree.push(folder);
+          }
+          folder.items.push(url);
+        } else {
+          that.tree.push(url);
+        }
+      });
+      that.saveToStorage();
+      that.displayList(function() { that.updateAllFeeds(); });
+    }, "json");
+
   },
   saveToStorage: function() {
     //Open a transaction with a scope of data stores and a read-write mode.
@@ -78,6 +113,7 @@ ReaderFeedList.prototype = {
     obj.activeFeed = this.activeFeed;
     obj.tree = this.tree;
     obj.feeds = Object.keys(this.feeds);
+    obj.isShowReadItems = this.isShowReadItems;
     return obj;
   },
   addFeed: function(url) {
@@ -147,6 +183,7 @@ ReaderFeedList.prototype = {
     this.saveToStorage();
   },
   displayList: function(callback) {
+    $("#btnShowReadItems").html((this.isShowReadItems ? 'All' : 'Unread')  + ' items <span class="icon-caret-down"></span>');
     this.ids = {};
     $("#feedList").empty();
     var that = this;
@@ -202,14 +239,13 @@ ReaderFeedList.prototype = {
   updateAllFeeds: function() {
     console.log("About to update all feeds");
     clearTimeout(this.timeout);
+    this.timeout = setTimeout(function() {
+      reader.feedList.updateAllFeeds();
+    }, 3 * 60 * 1000);
     for (var url in this.feeds) {
       var feed = this.feeds[url];
       feed.updateFeed();
     }
-    this.timeout = setTimeout(function() {
-      reader.feedList.updateAllFeeds();
-    }, 3 * 60 * 1000);
-
   },
   openItem: function(item, row) {
     if (typeof reader.openItem !== "undefined") {
@@ -279,18 +315,18 @@ ReaderFeedList.prototype = {
     this.saveToStorage();
   },
   refresh: function() {
-    this.selectFeed(this.activeFeed);
+    this.selectFeedOrFolder(this.activeFeed);
   },
   markAllRead: function() {
     var that = this;
     $.each(this.tree, function(i, val) {
-      if (typeof val === "string" && val === this.activeFeed)
+      if (typeof val === "string" && val === that.activeFeed)
         that.feeds[val].markAllRead();
-      else if (typeof val !== "string" && val.name === urlOrFolderName) {
+      else if (typeof val !== "string" && val.name === that.activeFeed) {
         $.each(val.items, function(j, url) {
           that.feeds[url].markAllRead();
         });
-        that.selectFolder(urlOrFolderName);
+        that.selectFolder(that.activeFeed);
       }
     });
     this.refresh();

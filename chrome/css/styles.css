@@ -57,8 +57,9 @@ div.itemTitleRead {
 }
 
 td.itemFeedName {
-  width: 100px;
+  width: 155px;
   overflow: hidden;
+  white-space: nowrap;
 }
 
 td.itemDateTime {

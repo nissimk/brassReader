@@ -44,16 +44,13 @@ reader.request.onsuccess = function(event) {
   
   reader.feedList = new ReaderFeedList();
   reader.feedList.loadFromStorage();
-  reader.timeout = setTimeout(function() {
-    reader.feedList.updateAllFeeds();
-  }, 180000);
-
 };
 
 
 $(document).ready(function() {
   $("#btnSaveFeed").click(addFeed);
   $("#btnImportOpml").click(importOpml);
+  $("#btnImportGReader").click(function() { reader.feedList.importGReader(); });
   $("#btnRefresh").click(function() { reader.feedList.refresh(); });
   // Fluid layout doesn't seem to support 100% height; manually set it
   $(window).resize(function() {
@@ -61,6 +58,13 @@ $(document).ready(function() {
     $('#left-section, #right-section').height(h);  
   })
   $(window).resize();
+  $("#btnMarkAllRead").click(function() { reader.feedList.markAllRead(); });
+  $("#mnuAllItems, #mnuUnreadItems").click(function(event) {
+    reader.feedList.isShowReadItems = !reader.feedList.isShowReadItems;
+    reader.feedList.refresh();
+    reader.feedList.saveToStorage();
+    $("#btnShowReadItems").html(event.target.innerText + ' <span class="icon-caret-down"></span>');
+  });
 });
 
 function addFeed(event) {
