@@ -14,11 +14,15 @@
 * display feed folder  -- only display feed title in folder view -- in single feed view omit the feed name from each item.
 * open/close folder
 * timer to get feeds  -- 
-import feedlist from reader API
+* import feedlist from reader API
 display only first n items, display more when scrolling
-folder unread count
-  - add folder to feed.
-  - add unread to folder object in tree
+* folder unread count
+*  - add folder to feed.
+*  - add unread to folder object in tree
+*  - calculate unread for all folders after all feeds load
+*  - modify folder unread when modifying feed unread
+*  - add unread to folder display
+*  - update folder unread display when modifying folder unread
 right side buttons:
 *  -display all or just unread
 *  -mark all read
@@ -27,6 +31,9 @@ right side buttons:
 * reclick feed / folder when already in it
 better error handling on feed import
 throttling of feed querying
+Add folder button
+make scrollbars skinny
+keyboard bindings
 feedlist menus:
   feed:
     move to folder >
@@ -36,4 +43,6 @@ feedlist menus:
     sort by oldesd
   folder: 
     mark all read
+Drag and drop feedlist items
+get favicons save and display in feedList
 
