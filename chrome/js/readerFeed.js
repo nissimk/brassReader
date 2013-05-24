@@ -155,6 +155,9 @@ ReaderFeedList.prototype = {
     this.saveToStorage();
   },
   selectFolder: function(folder) {
+    if (reader.feedList.elementWatcher) {
+      reader.feedList.elementWatcher.destroy;
+    }
     if (this.activeFeed !== '') {
       oldActiveId = this.ids[this.activeFeed];
       $("#" + oldActiveId).css("font-weight", "normal");
@@ -283,10 +286,16 @@ ReaderFeedList.prototype = {
     row.unbind('click').click(function(event) { reader.feedList.openItem(item, row); });
     row.removeClass("info");
   },
-  showItems: function(items, isShowFeed) {
-    $("#storyList").empty();
+  showItems: function(items, isShowFeed, startAt) {
+    this.feedItems = items
+    if (typeof startAt === "undefined")
+      startAt = 0;
+    if (startAt === 0)
+      $("#storyList").empty();
     var that = this;
-    $.each(items, function(i, val) {
+    var rowCount = 0;
+    var watcherRow = null;
+    $.each(items.slice(startAt), function(i, val) {
       var feed = that.feeds[val.feed];
       if (that.isShowReadItems || !val.marked) {
         var row = $($.parseHTML('<tr class="item" id="item-' + val.id + '"></tr>'));
@@ -302,8 +311,26 @@ ReaderFeedList.prototype = {
         row.append('<td class="itemTitleDesc"><div class="' + titleClass + '">' + 
                     val.title + '</div><span class="shortDesc"> - ' + shortDesc + "</div></td>");
         row.append('<td class="itemDateTime">' + new Date(val.updated).toDateOrTimeStr() + "</td>");
+        if (rowCount++ === 42) {
+          watcherRow = row;
+        }
+        if (rowCount === 50) {
+          if (i < items.length - 1) {
+            //add the scroll watcher
+            that.elementWatcher = scrollMonitor.create(watcherRow);
+            that.elementWatcher.enterViewport(function() {
+              reader.feedList.showItems(reader.feedList.feedItems, isShowFeed, startAt + 50);
+            });
+            $(".right-section").unbind("scroll").scroll(function() { 
+              reader.feedList.elementWatcher.recalculateLocation(); 
+              scrollMonitor.update(); 
+            });
+          }
+          return false;    //break out of $.each
+        }
       }
     });
+
   },
   openFolder: function(folder) {
     var id = this.ids[folder];
@@ -416,6 +443,9 @@ ReaderFeed.prototype = {
     });
   },
   displayFeed: function() {
+    if (reader.feedList.elementWatcher) {
+      reader.feedList.elementWatcher.destroy;
+    }
     var itms = [];
     for (var key in this.items) {
       itms.push(this.items[key]);

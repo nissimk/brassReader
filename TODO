@@ -15,7 +15,13 @@
 * open/close folder
 * timer to get feeds  -- 
 * import feedlist from reader API
-display only first n items, display more when scrolling
+* display only first n items, display more when scrolling
+*  - when showing items save the items array in feedList
+*  - only show 50 at a time
+*  - add parameter to showItems startAt default to 0
+*  - if there are more than startAt + 50 rows:
+*    - add scrollMonitor to 42nd row call showItems with saved item list and startAt + 50.
+*  - when displaying feed or folder clear out the scrollMonitor before creating the items list.
 * folder unread count
 *  - add folder to feed.
 *  - add unread to folder object in tree
@@ -29,7 +35,7 @@ right side buttons:
   -sort newest / oldest
   -feed settings show menu from item list
 * reclick feed / folder when already in it
-better error handling on feed import
+better error handling on feed update
 throttling of feed querying
 Add folder button
 make scrollbars skinny
