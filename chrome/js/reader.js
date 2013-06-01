@@ -52,11 +52,16 @@ $(document).ready(function() {
   $("#btnImportOpml").click(importOpml);
   $("#btnImportGReader").click(function() { reader.feedList.importGReader(); });
   $("#btnRefresh").click(function() { reader.feedList.refresh(); });
+  $("#btnClearDB").click(function() { 
+    indexedDB.deleteDatabase("BrassReader");
+    reader.feedList = new ReaderFeedList();
+    reader.feedList.displayList();
+  });
   // Fluid layout doesn't seem to support 100% height; manually set it
   $(window).resize(function() {
     var h = $(window).height() - $("#top-nav").height();
     $('#left-section, #right-section').height(h);  
-  })
+  });
   $(window).resize();
   $("#btnMarkAllRead").click(function() { reader.feedList.markAllRead(); });
   $("#mnuAllItems, #mnuUnreadItems").click(function(event) {

@@ -1,0 +1,23 @@
+develop a protocol for syncing databases using a shared file system
+  dropbox, google drive, webDAV
+single master multiple slave structure
+changesets
+master saves changesets in db with timestamps
+master posts changesets in store with unique id
+each slave posts tiny file when it has completed processing of changeset with error/success
+if all success master deletes changeset file
+
+
+Node actions:
+  join network request full database
+  join network request changesets since date
+  request to become master
+  takeover master after master disappears from network
+  upgrade to master status
+  downgrade to slave status
+
+Error conditions
+  shared storage is down but network is up
+  network is down.
+
+

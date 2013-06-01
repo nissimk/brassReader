@@ -7,10 +7,11 @@
     "48": "img/star-48.png",
     "128": "img/star.png"
   },
-  "app":{
-    "launch":{
-      "local_path":"index.html"
+  "app": {
+    "launch": {
+      "local_path": "index.html"
     }
   },
-  "permissions": ["cookies", "http://*/*", "https://*/*", "storage", "unlimitedStorage"]
+  "permissions": ["cookies", "http://*/*", "https://*/*", "storage", "unlimitedStorage"],
+  "offline_enabled": true
 }

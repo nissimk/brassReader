@@ -25,14 +25,17 @@ ReaderFeedList.prototype = {
           that.selectFeedOrFolder(val.activeFeed);
           that.updateAllFeeds();
         });
+      } else {
+        that.displayList();
       }
     };
   },
-  addFeedForImport: function(url, oldFeeds) {
+  addFeedForImport: function(url, oldFeeds, title) {
     if (url in oldFeeds) {
       this.feeds[url] = oldFeeds[url];
     } else {
-      this.feeds[url] = null;
+      this.feeds[url] = new ReaderFeed(url);
+      this.feeds[url].title = title;
     }
     return url;
   },
@@ -46,12 +49,12 @@ ReaderFeedList.prototype = {
     var that = this;
     $.each($("body > outline", opml), function(i, val) {
       if (val.childNodes.length === 0) {
-        that.tree.push(that.addFeedForImport(val.attributes.xmlUrl.value, oldFeeds));
+        that.tree.push(that.addFeedForImport(val.attributes.xmlUrl.value, oldFeeds, val.attributes.title.value));
       } else {
         var folder = {name: val.attributes.title.value, isOpen: true, items: [], unread: 0};
         $.each(val.childNodes, function(j, val2) {
           if (val2.attributes !== null) {
-            folder.items.push(that.addFeedForImport(val2.attributes.xmlUrl.value, oldFeeds));
+            folder.items.push(that.addFeedForImport(val2.attributes.xmlUrl.value, oldFeeds, val2.attributes.title.value));
           }
         });
         that.tree.push(folder);
@@ -75,12 +78,12 @@ ReaderFeedList.prototype = {
     this.ids = {};
     var that = this;
     $.get("http://www.google.com/reader/api/0/subscription/list?output=json", function(data) {
-      console.log(data);
+      //console.log(data);
       $.each(data.subscriptions, function(i, val) {
-        var url = that.addFeedForImport(val.id.substr(5), oldFeeds);
+        var url = that.addFeedForImport(val.id.substr(5), oldFeeds, val.title);
         if (val.categories.length) {
           var folder = that.getFolder(val.categories[0].label);
-          if (folder == null)
+          if (folder === null)
           {
             folder = {name: val.categories[0].label, items: [], isOpen: true, unread: 0};
             that.tree.push(folder);
@@ -103,9 +106,11 @@ ReaderFeedList.prototype = {
     //that has already been added to the scope of the transaction.  
     var store = trans.objectStore('feedlist');
     var obj = this.serialize();
-    console.log("writing feedList to database", obj);
+    //console.log("writing feedList to database", obj);
     var req = store.put(obj, 1); 
-    req.onsuccess = function() { window.console && console.log('successfully wrote feedlist to db'); };
+    req.onsuccess = function() { 
+      //window.console && console.log('successfully wrote feedlist to db'); 
+    };
     req.onerror = function() { window.console && console.log('failed to write feedlist to db'); };
   },
   serialize: function() {
@@ -144,9 +149,13 @@ ReaderFeedList.prototype = {
       $("#" + oldActiveId).css("font-weight", "normal");
     }
     $("#" + this.ids[url]).css("font-weight", "bold");
-    if (this.feeds[url] == null) {
-      var feed = new ReaderFeed(url);
-      this.feeds[url] = feed;
+    if (this.feeds[url] === null || Object.keys(this.feeds[url].items).length === 0) {
+      if (this.feeds[url] === null) {
+        var feed = new ReaderFeed(url);
+        this.feeds[url] = feed;
+      } else {
+        var feed = this.feeds[url];
+      }
       feed.loadFromStorage(function() { feed.displayFeed(); });
     } else {
       this.feeds[url].displayFeed();
@@ -166,22 +175,22 @@ ReaderFeedList.prototype = {
     var itms = [];
     var fld;
     var that = this;
-    console.log("Finding Folder", new Date());
+    //console.log("Finding Folder", new Date());
     $.each(this.tree, function(i, val) {
       if ($.isPlainObject(val) && val.name === folder)
         fld = val;
     });
-    console.log("Found Folder about to create items array", new Date());
+    //console.log("Found Folder about to create items array", new Date());
     $.each(fld.items, function(i, feed) {
       for (var key in that.feeds[feed].items) {
         itms.push(that.feeds[feed].items[key]);
       }
     });
-    console.log("created items array about to sort", new Date());
+    //console.log("created items array about to sort", new Date());
     itms.sort(function(a, b) { return b.updated - a.updated; });
-    console.log("items array sorted about to display " + itms.length, new Date());
+    //console.log("items array sorted about to display " + itms.length, new Date());
     this.showItems(itms, true);
-    console.log("displayed items", new Date());
+    //console.log("displayed items", new Date());
     this.activeFeed = folder;
     this.saveToStorage();
   },
@@ -189,53 +198,60 @@ ReaderFeedList.prototype = {
     $("#btnShowReadItems").html((this.isShowReadItems ? 'All' : 'Unread')  + ' items <span class="icon-caret-down"></span>');
     this.ids = {};
     $("#feedList").empty();
-    var that = this;
-    var promises = [];
-    $.each(this.tree, function(i, val) {
-      var showFeed = function(feed, id, list_id) {
-        var link = $('<li id="' + id + '"><a href="#">' + feed.title + 
-                      '<span id="' + id + '-unread"> (' + feed.unread + ')</span></a></li>');
-        link.click(function(event) { reader.feedList.selectFeed(feed.url); });
-        $(list_id).append(link);
-        that.ids[feed.url] = id;
-      };
-      var getAndShowFeed = function(url, id, list_id, folder) {
-        var feed = that.feeds[url];
-        if (feed == null) {
-          feed = new ReaderFeed(url);
-          promises.push(feed.loadFromStorage(function() { showFeed(feed, id, list_id); feed.folder = folder }));
-          that.feeds[url] = feed;
-        } else {
-          showFeed(feed, id, list_id);
+    if (this.tree.length === 0) {
+      $("#storyList").empty();
+      $("#storyList").append('<tr><td><div class="well"><h4>Welcome to Brass Reader.  Use the buttons on the left to start adding subsctiptions or import from Google Reader or OPML.</h4></div></td></tr>');
+    } else {
+      var that = this;
+      var promises = [];
+      $.each(this.tree, function(i, val) {
+        var showFeed = function(feed, id, list_id) {
+          var link = $('<li id="' + id + '"><a href="#">' + feed.title + 
+                        '<span id="' + id + '-unread"> (' + feed.unread + ')</span></a></li>');
+          link.click(function(event) { reader.feedList.selectFeed(feed.url); });
+          $(list_id).append(link);
+          that.ids[feed.url] = id;
+        };
+        var getAndShowFeed = function(url, id, list_id, folder) {
+          var feed = that.feeds[url];
+          if (feed === null || Object.keys(feed.items).length === 0) {
+            if (feed === null) {
+              feed = new ReaderFeed(url);
+            }
+            promises.push(feed.loadFromStorage(function() { showFeed(feed, id, list_id); feed.folder = folder }));
+            that.feeds[url] = feed;
+          } else {
+            showFeed(feed, id, list_id);
+          }
+        };
+        if (typeof val === "string") {  //val is a feed
+          getAndShowFeed(val, "list-" + i, "#feedList", null);
+        } else {   //val is a folder
+          var id = "list-" + i;
+          if (val.isOpen) {
+            var caret = $('<div class="divlink"><i class="icon-caret-down"></i></div>');
+            caret.click(function(event) { reader.feedList.closeFolder(val.name); });
+          }
+          else {
+            var caret = $('<div class="divlink"><i class="icon-caret-right"></i></div>');
+            caret.click(function(event) { reader.feedList.openFolder(val.name); });
+          }
+          var link = $('<li id="' + id + '"><a href="#"><i class="icon-folder-close"></i>' + val.name + 
+                        '<span id="' + id + '-unread"> (' + 
+                        val.unread + ')</span></a></li><ul class="nav nav-list" id="sublist-' + i + '"></ul>');
+          $("a", link).click(function(event) { reader.feedList.selectFolder(val.name); });
+          $("#feedList").append(link);
+          $("#" + id + " a").prepend(caret);
+          that.ids[val.name] = id;
+          $.each(val.items, function(j, val2) {
+            getAndShowFeed(val2, "list-" + i + "-" + j, "#sublist-" + i, val.name);
+          });
+          if (!val.isOpen) 
+            $("#sublist-" + i).hide();
         }
-      };
-     if (typeof val === "string") {  //val is a feed
-       getAndShowFeed(val, "list-" + i, "#feedList", null);
-     } else {   //val is a folder
-        var id = "list-" + i;
-        if (val.isOpen) {
-          var caret = $('<div class="divlink"><i class="icon-caret-down"></i></div>');
-          caret.click(function(event) { reader.feedList.closeFolder(val.name); });
-        }
-        else {
-          var caret = $('<div class="divlink"><i class="icon-caret-right"></i></div>');
-          caret.click(function(event) { reader.feedList.openFolder(val.name); });
-        }
-        var link = $('<li id="' + id + '"><a href="#"><i class="icon-folder-close"></i>' + val.name + 
-                      '<span id="' + id + '-unread"> (' + 
-                      val.unread + ')</span></a></li><ul class="nav nav-list" id="sublist-' + i + '"></ul>');
-        $("a", link).click(function(event) { reader.feedList.selectFolder(val.name); });
-        $("#feedList").append(link);
-        $("#" + id + " a").prepend(caret);
-        that.ids[val.name] = id;
-        $.each(val.items, function(j, val2) {
-          getAndShowFeed(val2, "list-" + i + "-" + j, "#sublist-" + i, val.name);
-        });
-        if (!val.isOpen) 
-          $("#sublist-" + i).hide();
-      }
-    });
-    $.when.apply(null, promises).then(function() { that.calcAllFoldersUnread(); callback(); });
+      });
+      $.when.apply(null, promises).then(function() { that.calcAllFoldersUnread(); callback(); });
+    }
   },
   calcAllFoldersUnread: function() {
     var that = this;
@@ -255,7 +271,7 @@ ReaderFeedList.prototype = {
     $('#' + id + '-unread').text(' (' + count + ')');
   },
   updateAllFeeds: function() {
-    console.log("About to update all feeds");
+    //console.log("About to update all feeds");
     clearTimeout(this.timeout);
     this.timeout = setTimeout(function() {
       reader.feedList.updateAllFeeds();
@@ -384,63 +400,84 @@ function ReaderFeed(url) {
   this.items = {};    // keyed by ID
   this.unread = 0;
   this.folder = null;
+  this.nextUpdate = new Date();
+  this.interval = 2;   //interval in minutes between updates
+  this.isErrror = false;
  }
 
 ReaderFeed.prototype = {
   updateFeed: function(onComplete) {
-    var that = this;
-    console.log("updating feed: ", this);
-    $.getFeed({
-      url: that.url,
-      success: function(feed) {
-        that.lastLoaded = new Date().getTime();
-        that.title = feed.title;
-        that.description = feed.description;
-        that.language = feed.language;
+    if (this.nextUpdate > new Date() || this.isError) {
+      return new $.Deferred().resolve();
+    } else {
+      var that = this;
+      //console.log("updating feed: ", this);
+      return $.getFeed({
+        url: that.url,
+        success: function(feed) {
+          that.lastLoaded = new Date().getTime();
+          that.title = feed.title;
+          that.description = feed.description;
+          that.language = feed.language;
+          var isNewItems = false;
 
-        $.each(feed.items, function(i, val) {
-          if (val.id || "" === "") {
-            //might want to exclude the title before hashing
-            val.id = JSON.stringify(val).hashCode();
-          }
-          //console.log("item: ", val);
-          if (!(val.id in that.items)) {
-            if (val.updated || "" === "") {
-              val.updated = new Date().getTime();
+          $.each(feed.items, function(i, val) {
+            if (val.id || "" === "") {
+              //might want to exclude the title before hashing
+              val.id = JSON.stringify(val).hashCode();
             }
-            val.feed = that.url;
-            val.marked = false;
-            $.extend(val, val, reader.itemFunctions);
-            val.saveToStorage();
-            that.items[val.id] = val;
-            that.unread++;
-            if (that.folder !== null) {
-              reader.feedList.getFolder(that.folder).unread++;
+            //console.log("item: ", val);
+            if (!(val.id in that.items)) {
+              isNewItems = true;
+              if (val.updated || "" === "") {
+                val.updated = new Date().getTime();
+              }
+              val.feed = that.url;
+              val.marked = false;
+              $.extend(val, val, reader.itemFunctions);
+              val.saveToStorage();
+              that.items[val.id] = val;
+              that.unread++;
+              if (that.folder !== null) {
+                reader.feedList.getFolder(that.folder).unread++;
+              }
             }
+          });
+          if (! that.interval) {
+            that.interval = 2;
           }
-        });
-        that.saveToStorage();
-        reader.feedList.updateUnread(that.url, that.unread);
-        if (that.folder !== null) {
-          reader.feedList.updateUnread(that.folder, reader.feedList.getFolder(that.folder).unread);
+          if (isNewItems && that.interval > 2) {
+            that.interval /= 2;
+          }
+          if (!isNewItems && that.interval < 256) {
+            that.interval *= 2;
+          }
+          if (!that.nextUpdate) {
+            that.nextUpdate = new Date();
+          }
+          that.nextUpdate.setTime(new Date().getTime() + (that.interval * 60 * 1000));
+          that.saveToStorage();
+          reader.feedList.updateUnread(that.url, that.unread);
+          if (that.folder !== null) {
+            reader.feedList.updateUnread(that.folder, reader.feedList.getFolder(that.folder).unread);
+          }
+          if (typeof onComplete === "function") {
+            onComplete(that);
+          }
+        },
+        error: function(xhr, msg, e){
+          if ((xhr.status >= 400 && xhr.status < 500) ||
+              msg == "parsererror") {
+            that.isError = true;
+          } else {
+            window.console && console.log('getFeed failed to load feed', xhr, msg, e, that);
+          }
+          if (typeof onComplete === "function") {
+            onComplete(that);
+          }
         }
-        if (typeof onComplete === "function") {
-          onComplete(that);
-        }
-      },
-      failure: function(xhr, msg, e){
-        window.console && console.log('getFeed failed to load feed', xhr, msg, e);
-        if (typeof onComplete === "function") {
-          onComplete(that);
-        }
-      },
-      error: function(xhr, msg, e){
-        window.console && console.log('getFeed failed to load feed', xhr, msg, e);
-        if (typeof onComplete === "function") {
-          onComplete(that);
-        }
-      }
-    });
+      });
+    }
   },
   displayFeed: function() {
     if (reader.feedList.elementWatcher) {
@@ -468,6 +505,9 @@ ReaderFeed.prototype = {
     obj.title = this.title;
     obj.language = this.language;
     obj.folder = this.folder;
+    obj.nextUpdate = this.nextUpdate;
+    obj.interval = this.interval;
+    obj.isError = this.isError;
     return obj;
   },
   saveToStorage: function() {
@@ -478,23 +518,34 @@ ReaderFeed.prototype = {
     //that has already been added to the scope of the transaction.  
     var store = trans.objectStore('feeds');
     var req = store.put(this.serialize()); 
-    req.onsuccess = function() { window.console && console.log('successfully wrote feed to db'); };
+    req.onsuccess = function() { 
+      //window.console && console.log('successfully wrote feed to db'); 
+    };
     req.onerror = function() { window.console && console.log('failed to write feed to db'); };
   },
   loadFromStorage: function(doneCallBack) {
     var that = this;
     var dfd = $.Deferred();
     var trans = reader.db.transaction('feeds').objectStore('feeds').get(that.url).onsuccess = function (event) {
+      var cb = function() {
+        if ($.isFunction(doneCallBack)) {
+          doneCallBack();
+        }
+        dfd.resolve();
+      };
       obj = event.target.result;
       if (typeof obj === "undefined") {
         //it's not in the database...update feed from rss server
-        that.updateFeed(dfd.resolve);
+        that.updateFeed(cb);
       } else {
         that.lastLoaded = obj.lastLoaded;
         that.title = obj.title;
         that.description = obj.description;
         that.language = obj.language;
         that.folder = obj.folder;
+        that.nextUpdate = obj.nextUpdate;
+        that.interval = obj.interval;
+        that.isError = obj.isError
         //use a cursor here to retrieve all items from this feed
         var itemStore = reader.db.transaction('items').objectStore('items');
         var feedIndex = itemStore.index("feed");
@@ -510,10 +561,7 @@ ReaderFeed.prototype = {
             cursor.continue();
           } 
           else {
-            if ($.isFunction(doneCallBack)) {
-              doneCallBack();
-            }
-            dfd.resolve();
+            cb();
           }
         };
       }
@@ -553,7 +601,9 @@ reader.itemFunctions = {
     //console.log("about to store item");
     //console.log(copy);
     var req = store.put(copy); 
-    req.onsuccess = function() { window.console && console.log('successfully wrote item to db'); };
+    req.onsuccess = function() { 
+      //window.console && console.log('successfully wrote item to db'); 
+    };
     req.onerror = function() { window.console && console.log('failed to write item to db'); };
   }
 }

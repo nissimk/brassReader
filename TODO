@@ -33,10 +33,25 @@ right side buttons:
 *  -display all or just unread
 *  -mark all read
   -sort newest / oldest
-  -feed settings show menu from item list
+  -feed settings show menu from feed list
 * reclick feed / folder when already in it
+* throttling of feed querying
+*  - add interval to feed, start at 2 minutes
+*  - if feed returns no new items double interval unless interval = 256
+*  - if feed returns new items, halve interval unless interval = 2
+*  - save interval and save next update time = now + interval minutes
+*  -when updating feeds, only choose feeds that have next update < now.
 better error handling on feed update
-throttling of feed querying
+*  -400 - 405 set is Error to true in the feed.
+*  -same for parseError
+  -add Field to feed containing the error.
+*  -never process feeds with isError = true
+  -I don't know how to handle "error" with status = 0 -- this could be network disconnect, 
+      DNS resolution failure, exit the page before xhr completes
+  -create screen for looking up isError feed links with ability to remove
+    -categorize under cannot find and feeds may have moved.
+    -have textbox to enter new feed url
+  -When updating all feeds -- if everything fails we are offline.  reduce refresh frequency and alert user
 Add folder button
 make scrollbars skinny
 keyboard bindings
@@ -50,5 +65,11 @@ feedlist menus:
   folder: 
     mark all read
 Drag and drop feedlist items
+Start screen put instructions when feedlist is empty
+Show No unread items alert in the item list when isShowReadItems false and new item count = 0
 get favicons save and display in feedList
+/i view subscriptions and feeds for phone size screen
+syncing system
+firefox extension
+android app
 

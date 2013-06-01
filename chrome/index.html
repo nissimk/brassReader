@@ -33,6 +33,9 @@
             </ul>
           </div>
           <a class="btn" id="btnMarkAllRead">Mark all read</a>
+          <div class="top-right-buttons">
+            <a class="btn" id="btnSettings" title="Settings" data-toggle="modal" data-target="#modalSettings"><i class="icon-cogs"></i></a>
+          </div>
         </div>
       </div>
       <div class="row-fluid">
@@ -79,7 +82,7 @@
         <h3>Import OPML</h3>
       </div>
       <div class="modal-body">
-        <p>Seleect File:</p>
+        <p>Select File:</p>
         <form name="frmNewFeed">
           <input type="file" id="txtOpmlFile"></input>
         </form>
@@ -87,6 +90,30 @@
       <div class="modal-footer">
         <a href="#" class="btn" id="btnCancelAddFeed" data-dismiss="modal">Cancel</a>
         <a href="#" class="btn btn-primary" id="btnImportOpml">Import</a>
+      </div>
+    </div>
+    <div class="modal hide fade" id="modalSettings">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h3>Brass Reader Settings</h3>
+      </div>
+      <div class="modal-body">
+        <ul class="nav nav-tabs">
+          <li class="active"><a href="#generalSettings" data-toggle="tab">General</a></li>
+          <li><a href="#advancedSettings" data-toggle="tab">Advanced</a></li>
+        </ul>
+        <div class="tab-content">
+          <div class="tab-pane active" id="generalSettings">
+            General Settings go here.
+          </div>
+          <div class="tab-pane" id="advancedSettings">
+            <a class="btn" href="#" id="btnClearDB">Clear Database</a>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <a href="#" class="btn" id="btnCancelSettings" data-dismiss="modal">Cancel</a>
+        <a href="#" class="btn" id="btnOKSettings">OK</a>
       </div>
     </div>
 </body>
