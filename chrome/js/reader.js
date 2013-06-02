@@ -46,10 +46,33 @@ reader.request.onsuccess = function(event) {
   reader.feedList.loadFromStorage();
 };
 
+reader.handlers = {
+  addFeed: function addFeed(event) {
+    $("#modalAddFeed").modal("hide");
+    var newFeed = $("#txtNewFeed").val();
+    reader.feedList.addFeed(newFeed);
+  },
+  addFolder: function addFolder(event) {
+    $("#modalAddFolder").modal("hide");
+    var newFolder = $("#txtNewFolder").val();
+    reader.feedList.addFolder(newFolder);
+  },
+  importOpml: function importOpml(event) {
+    $("#modalImportOpml").modal("hide");
+    freader = new FileReader();
+    freader.onload = function(e) {
+      opml = $.parseXML(e.target.result);
+      //reader.opml = opml;
+      reader.feedList.loadFromOPML(opml);
+    }
+    freader.readAsText($("#txtOpmlFile").get()[0].files[0]);
+  }
+};
 
 $(document).ready(function() {
-  $("#btnSaveFeed").click(addFeed);
-  $("#btnImportOpml").click(importOpml);
+  $("#btnSaveFeed").click(reader.handlers.addFeed);
+  $("#btnSaveFolder").click(reader.handlers.addFolder);
+  $("#btnImportOpml").click(reader.handlers.importOpml);
   $("#btnImportGReader").click(function() { reader.feedList.importGReader(); });
   $("#btnRefresh").click(function() { reader.feedList.refresh(); });
   $("#btnClearDB").click(function() { 
@@ -72,19 +95,4 @@ $(document).ready(function() {
   });
 });
 
-function addFeed(event) {
-  $("#modalAddFeed").modal("hide");
-  var newFeed = $("#txtNewFeed").val();
-  reader.feedList.addFeed(newFeed);
-}
 
-function importOpml(event) {
-  $("#modalImportOpml").modal("hide");
-  freader = new FileReader();
-  freader.onload = function(e) {
-    opml = $.parseXML(e.target.result);
-    //reader.opml = opml;
-    reader.feedList.loadFromOPML(opml);
-  }
-  freader.readAsText($("#txtOpmlFile").get()[0].files[0]);
-}

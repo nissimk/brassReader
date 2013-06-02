@@ -134,6 +134,21 @@ ReaderFeedList.prototype = {
       that.saveToStorage();
     });
   },
+  addFolder: function(folderName) {
+    var len = this.tree.push({name: folderName, items: [], isOpen: true, unread: 0});
+    var i = len - 1;
+    var id = "list-" + i;
+    this.ids[folderName] = id;
+    var caret = $('<div class="divlink"><i class="icon-caret-down"></i></div>');
+    caret.click(function(event) { reader.feedList.closeFolder(folderName); });
+    var link = $('<li id="' + id + '"><a href="#"><i class="icon-folder-close"></i>' + folderName + 
+                 '<span id="' + id + '-unread"> (' + 
+                 '0)</span></a></li><ul class="nav nav-list" id="sublist-' + i + '"></ul>');
+    $("a", link).click(function(event) { reader.feedList.selectFolder(folderName); });
+    $("#feedList").append(link);
+    $("#" + id + " a").prepend(caret);
+    this.saveToStorage();
+  },
   selectFeedOrFolder: function(urlOrFolderName) {
     var that = this;
     $.each(this.tree, function(i, val) {

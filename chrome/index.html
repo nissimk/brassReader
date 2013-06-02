@@ -33,7 +33,7 @@
             </ul>
           </div>
           <a class="btn" id="btnMarkAllRead">Mark all read</a>
-          <div class="top-right-buttons">
+          <div class="pull-right">
             <a class="btn" id="btnSettings" title="Settings" data-toggle="modal" data-target="#modalSettings"><i class="icon-cogs"></i></a>
           </div>
         </div>
@@ -44,7 +44,7 @@
           <form name="frmSidebar">
             <div class="btn-group">
               <a class="btn" href="#" title="Add Feed" data-toggle="modal" data-target="#modalAddFeed"><i class="icon-rss"></i></a>
-              <a class="btn" href="#" title="Add Folder"><i class="icon-folder-close"></i></a>
+              <a class="btn" href="#" title="Add Folder" data-toggle="modal" data-target="#modalAddFolder"><i class="icon-folder-close"></i></a>
               <a class="btn" href="#" title="Import feeds from Google Reader" id="btnImportGReader">
                 <i class="icon-cloud-download"></i></a>
               <a class="btn" href="#" title="Import OPML" data-toggle="modal" data-target="#modalImportOpml"><i class="icon-briefcase"></i></a>
@@ -74,6 +74,22 @@
       <div class="modal-footer">
         <a href="#" class="btn" data-dismiss="modal">Cancel</a>
         <a href="#" class="btn btn-primary" id="btnSaveFeed">Save changes</a>
+      </div>
+    </div>
+    <div class="modal hide fade" id="modalAddFolder">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h3>Add Folder</h3>
+      </div>
+      <div class="modal-body">
+        <p>Enter New Folder Name</p>
+        <form name="frmNewFeed">
+          <input type="text" id="txtNewFolder"></input>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <a href="#" class="btn" data-dismiss="modal">Cancel</a>
+        <a href="#" class="btn btn-primary" id="btnSaveFolder">Save changes</a>
       </div>
     </div>
     <div class="modal hide fade" id="modalImportOpml">
