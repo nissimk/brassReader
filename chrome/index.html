@@ -11,11 +11,13 @@
 </head>
 <body>
     <script src="js/jquery-1.9.1.min.js"></script>
+    <script src="js/underscore-min.js"></script>
     <script src="js/jquery.jfeed.js"></script>
     <script src="js/bootstrap.min.js"></script>
     <script src="js/scrollMonitor.js"></script>
     <script src="js/readerUtils.js"></script>
     <script src="js/reader.js"></script>
+    <script src="js/readerTemplates.js"></script>
     <script src="js/readerFeed.js"></script>
     <div class="container-fluid">
       <div class="row-fluid" id="top-nav">
@@ -131,6 +133,16 @@
         <a href="#" class="btn" id="btnCancelSettings" data-dismiss="modal">Cancel</a>
         <a href="#" class="btn" id="btnOKSettings">OK</a>
       </div>
+    </div>
+    <div class="dropdown" id="divFolderDropDown">
+      <ul id="ulFolderDropDown" class="dropdown-menu" role="menu">
+        <li><a href="#">Sort by Oldest</a></li>
+        <li><a href="#">Sort by Newest</a></li>
+        <li class="divider"></li>
+        <li><a href="#">Rename Folder</a></li>
+        <li><a href="#">Delete Folder</a></li>
+        <li><a href="#">Unsubscribe All</a></li>
+      </ul>
     </div>
 </body>
 

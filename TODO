@@ -52,7 +52,7 @@ better error handling on feed update
     -categorize under cannot find and feeds may have moved.
     -have textbox to enter new feed url
   -When updating all feeds -- if everything fails we are offline.  reduce refresh frequency and alert user
-Add folder button
+* Add folder button
 make scrollbars skinny
 keyboard bindings
 feedlist menus:
@@ -64,8 +64,9 @@ feedlist menus:
     sort by oldesd
   folder: 
     mark all read
+    unsubscribe all
 Drag and drop feedlist items
-Start screen put instructions when feedlist is empty
+* Start screen put instructions when feedlist is empty
 Show No unread items alert in the item list when isShowReadItems false and new item count = 0
 get favicons save and display in feedList
 /i view subscriptions and feeds for phone size screen

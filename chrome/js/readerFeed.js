@@ -36,6 +36,7 @@ ReaderFeedList.prototype = {
     } else {
       this.feeds[url] = new ReaderFeed(url);
       this.feeds[url].title = title;
+      this.feeds[url].saveToStorage();
     }
     return url;
   },
@@ -129,7 +130,8 @@ ReaderFeedList.prototype = {
     this.feeds[url] = newFeed;
     var that = this;
     newFeed.updateFeed(function(feed) {
-      $("#feedList").append('<li id="' + id + '">' + feed.title + '<span id="' + id + '-unread"> (' + feed.unread + ")</span></li>");
+      $("#feedList").append(reader.templates.feedItemInTree(
+        {'id': id, 'title': feed.title, 'unread': feed.unread}));
       that.selectFeed(url);
       that.saveToStorage();
     });
@@ -139,14 +141,12 @@ ReaderFeedList.prototype = {
     var i = len - 1;
     var id = "list-" + i;
     this.ids[folderName] = id;
-    var caret = $('<div class="divlink"><i class="icon-caret-down"></i></div>');
+    var caret = $(reader.templates.folderCaret({'isOpen': true}));
     caret.click(function(event) { reader.feedList.closeFolder(folderName); });
-    var link = $('<li id="' + id + '"><a href="#"><i class="icon-folder-close"></i>' + folderName + 
-                 '<span id="' + id + '-unread"> (' + 
-                 '0)</span></a></li><ul class="nav nav-list" id="sublist-' + i + '"></ul>');
+    var link = $(reader.templates.folderItemInTree({'id': id, 'folderName': folderName, 'unread': 0}));
     $("a", link).click(function(event) { reader.feedList.selectFolder(folderName); });
     $("#feedList").append(link);
-    $("#" + id + " a").prepend(caret);
+    $("#" + id).prepend(caret);
     this.saveToStorage();
   },
   selectFeedOrFolder: function(urlOrFolderName) {
@@ -210,19 +210,19 @@ ReaderFeedList.prototype = {
     this.saveToStorage();
   },
   displayList: function(callback) {
-    $("#btnShowReadItems").html((this.isShowReadItems ? 'All' : 'Unread')  + ' items <span class="icon-caret-down"></span>');
+    $("#btnShowReadItems").html(reader.templates.btnShowReadItemsCaption(
+        {'isShowReadItems': this.isShowReadItems}));
     this.ids = {};
     $("#feedList").empty();
     if (this.tree.length === 0) {
       $("#storyList").empty();
-      $("#storyList").append('<tr><td><div class="well"><h4>Welcome to Brass Reader.  Use the buttons on the left to start adding subsctiptions or import from Google Reader or OPML.</h4></div></td></tr>');
+      $("#storyList").append(reader.templates.newUserMessage);
     } else {
       var that = this;
       var promises = [];
       $.each(this.tree, function(i, val) {
         var showFeed = function(feed, id, list_id) {
-          var link = $('<li id="' + id + '"><a href="#">' + feed.title + 
-                        '<span id="' + id + '-unread"> (' + feed.unread + ')</span></a></li>');
+          var link = $(reader.templates.feedItemInTree({'id': id, 'title': feed.title, 'unread': feed.unread}));
           link.click(function(event) { reader.feedList.selectFeed(feed.url); });
           $(list_id).append(link);
           that.ids[feed.url] = id;
@@ -243,20 +243,21 @@ ReaderFeedList.prototype = {
           getAndShowFeed(val, "list-" + i, "#feedList", null);
         } else {   //val is a folder
           var id = "list-" + i;
+          var caret = $(reader.templates.folderCaret({'isOpen': val.isOpen}));
           if (val.isOpen) {
-            var caret = $('<div class="divlink"><i class="icon-caret-down"></i></div>');
             caret.click(function(event) { reader.feedList.closeFolder(val.name); });
           }
           else {
-            var caret = $('<div class="divlink"><i class="icon-caret-right"></i></div>');
             caret.click(function(event) { reader.feedList.openFolder(val.name); });
           }
-          var link = $('<li id="' + id + '"><a href="#"><i class="icon-folder-close"></i>' + val.name + 
-                        '<span id="' + id + '-unread"> (' + 
-                        val.unread + ')</span></a></li><ul class="nav nav-list" id="sublist-' + i + '"></ul>');
+          var dropdown = $("#divFolderDropDown").clone().attr("id", "divFolderDropDown-" + i).addClass("pull-right");
+          dropdown.prepend($(reader.templates.folderDropdownTrigger({'i': i})));
+          var link = $(reader.templates.folderItemInTree({'id': id, 'folderName': val.name, 'unread': val.unread}));
           $("a", link).click(function(event) { reader.feedList.selectFolder(val.name); });
+          link.hover(function(event) { $("#folderMenu-" + i).show(); },
+                     function(event) { $("#folderMenu-" + i).hide(); });
           $("#feedList").append(link);
-          $("#" + id + " a").prepend(caret);
+          $("#" + id).prepend(dropdown).prepend(caret);
           that.ids[val.name] = id;
           $.each(val.items, function(j, val2) {
             getAndShowFeed(val2, "list-" + i + "-" + j, "#sublist-" + i, val.name);
@@ -301,9 +302,9 @@ ReaderFeedList.prototype = {
       reader.openItem.prev().removeClass("info");
       reader.openItem.remove();
     }
-    var title = '<h4><a href="' + item.link + '">' + item.title + '</a></h4>';
-    newRow = $('<tr class="openItemRow"><td colspan=' + row.children().length  + ' class="openItemCell"><div class="itemContent">' + 
-                title + item.description + '</div></td></tr>');
+    newRow = $(reader.templates.itemRowOpen(
+        {'colspan': row.children().length, 'link': item.link, 
+         'title': item.title, 'description': item.description} ));
     $("a", newRow).attr("target", "_blank");
     row.after(newRow);
     row.addClass("info");
@@ -329,19 +330,19 @@ ReaderFeedList.prototype = {
     $.each(items.slice(startAt), function(i, val) {
       var feed = that.feeds[val.feed];
       if (that.isShowReadItems || !val.marked) {
-        var row = $($.parseHTML('<tr class="item" id="item-' + val.id + '"></tr>'));
+        var row = $(reader.templates.itemRowClosed({'itemId': val.id}));
         row.click(function(event) { reader.feedList.openItem(val, row); });
         $("#storyList").append(row);
         if (isShowFeed) 
-          row.append('<td class="itemFeedName">' + feed.title + "</td>");
+          row.append(reader.templates.feedTitleCell({'title': feed.title}));
         var shortDesc = $("<div>" + val.description + "</div>").text().substring(0, 100);
         var titleClass = "itemTitleUnread";
         if (val.marked) {
           titleClass = "itemTitleRead";
         }
-        row.append('<td class="itemTitleDesc"><div class="' + titleClass + '">' + 
-                    val.title + '</div><span class="shortDesc"> - ' + shortDesc + "</div></td>");
-        row.append('<td class="itemDateTime">' + new Date(val.updated).toDateOrTimeStr() + "</td>");
+        row.append(reader.templates.feedDescCell(
+          {'titleClass': titleClass, 'shortDesc': shortDesc, 'title': val.title}));
+        row.append(reader.templates.feedTimeCell({'dt': new Date(val.updated).toDateOrTimeStr()}));
         if (rowCount++ === 42) {
           watcherRow = row;
         }
@@ -370,7 +371,7 @@ ReaderFeedList.prototype = {
       if ($.isPlainObject(val) && val.name == folder)
         val.isOpen = true;
     });
-    var caret = $("#" + id).find(".icon-caret-right");
+    var caret = $("#" + id).find(".folder-open-close");
     caret.removeClass("icon-caret-right").addClass("icon-caret-down");
     caret.parent().unbind('click').click(function(event) { reader.feedList.closeFolder(folder); });
     this.saveToStorage();
@@ -382,7 +383,7 @@ ReaderFeedList.prototype = {
       if ($.isPlainObject(val) && val.name == folder)
         val.isOpen = false;
     });
-    var caret = $("#" + id).find(".icon-caret-down");
+    var caret = $("#" + id).find(".folder-open-close");
     caret.removeClass("icon-caret-down").addClass("icon-caret-right");
     caret.parent().unbind('click').click(function(event) { reader.feedList.openFolder(folder); });
     this.saveToStorage();

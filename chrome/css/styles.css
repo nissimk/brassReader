@@ -8,10 +8,24 @@ body {
   overflow: auto;
 }
 
-.left-section a, .left-section a:hover, .left-section a:link, .left-section a:visited, .left-section .divlink {
+.left-section a, .left-section a:hover, .left-section a:link, .left-section a:visited {
   color: #000;
   text-decoration: none;
+}
+
+.divlink {
   display: inline;
+  float: left;
+}
+
+.tree-item {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.folder-dropdown {
+  display: none;
 }
 
 .header-text {
