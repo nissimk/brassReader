@@ -14,7 +14,7 @@ body {
 }
 
 .divlink {
-  display: inline;
+  display: block;
   float: left;
 }
 

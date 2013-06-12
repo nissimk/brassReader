@@ -52,7 +52,7 @@ ReaderFeedList.prototype = {
       if (val.childNodes.length === 0) {
         that.tree.push(that.addFeedForImport(val.attributes.xmlUrl.value, oldFeeds, val.attributes.title.value));
       } else {
-        var folder = {name: val.attributes.title.value, isOpen: true, items: [], unread: 0};
+        var folder = {name: val.attributes.title.value, isOpen: true, items: [], unread: 0, order: 1};
         $.each(val.childNodes, function(j, val2) {
           if (val2.attributes !== null) {
             folder.items.push(that.addFeedForImport(val2.attributes.xmlUrl.value, oldFeeds, val2.attributes.title.value));
@@ -86,7 +86,7 @@ ReaderFeedList.prototype = {
           var folder = that.getFolder(val.categories[0].label);
           if (folder === null)
           {
-            folder = {name: val.categories[0].label, items: [], isOpen: true, unread: 0};
+            folder = {name: val.categories[0].label, items: [], isOpen: true, unread: 0, order: 1};
             that.tree.push(folder);
           }
           folder.items.push(url);
@@ -97,7 +97,6 @@ ReaderFeedList.prototype = {
       that.saveToStorage();
       that.displayList(function() { that.updateAllFeeds(); });
     }, "json");
-
   },
   saveToStorage: function() {
     //Open a transaction with a scope of data stores and a read-write mode.
@@ -136,18 +135,160 @@ ReaderFeedList.prototype = {
       that.saveToStorage();
     });
   },
-  addFolder: function(folderName) {
-    var len = this.tree.push({name: folderName, items: [], isOpen: true, unread: 0});
-    var i = len - 1;
+  renderFolder: function(folder, i) {
     var id = "list-" + i;
-    this.ids[folderName] = id;
-    var caret = $(reader.templates.folderCaret({'isOpen': true}));
-    caret.click(function(event) { reader.feedList.closeFolder(folderName); });
-    var link = $(reader.templates.folderItemInTree({'id': id, 'folderName': folderName, 'unread': 0}));
-    $("a", link).click(function(event) { reader.feedList.selectFolder(folderName); });
+    this.ids[folder.name] = id;
+    var caret = $(reader.templates.folderCaret({'isOpen': folder.isOpen}));
+    if (folder.isOpen) {
+      caret.click(function(event) { reader.feedList.closeFolder(folder.name); });
+    }
+    else {
+      caret.click(function(event) { reader.feedList.openFolder(folder.name); });
+    }
+    var dropdown = $("#divFolderDropDown").clone().attr("id", "divFolderDropDown-" + i).addClass("pull-right");
+    dropdown.prepend($(reader.templates.folderDropdownTrigger({'i': i})));
+    var link = $(reader.templates.folderItemInTree({'id': id, 'folderName': folder.name, 'unread': folder.unread}));
+    $("a", link).click(function(event) { reader.feedList.selectFolder(folder.name); });
     $("#feedList").append(link);
-    $("#" + id).prepend(caret);
+    $("#" + id).prepend(dropdown).prepend(caret)
+        .hover(function(event) { $("#folderMenu-" + i).show(); },
+               function(event) { $("#folderMenu-" + i).hide(); });
+    $("#" + id + " #mnuSortByOldest").click(function(event) { reader.feedList.sort(folder.name, -1); });
+    $("#" + id + " #mnuSortByNewest").click(function(event) { reader.feedList.sort(folder.name, 1); });
+    $("#" + id + " #mnuRenameFolder").click(function(event) { reader.handlers.renameFolder(folder.name); });
+    $("#" + id + " #mnuDeleteFolder").click(function(event) { reader.feedList.deleteFolder(folder.name); });
+    $("#" + id + " #mnuUnsubscribeAll").click(function(event) { reader.feedList.unsubscribe(folder.name); });
+    $("#" + id + " #mnuMarkAllRead").click(function(event) { reader.feedList.markAllRead(folder.name); });
+    return link;
+  },
+  addFolder: function(folderName) {
+    var folder = {name: folderName, items: [], isOpen: true, unread: 0, order: 1};
+    var len = this.tree.push(folderName);
+    var i = len - 1;
+    this.renderFolder(folder, i);
     this.saveToStorage();
+  },
+  deleteFolder: function(folderName) {
+    var folder = this.getFolder(folderName);
+    var that = this;
+    $.each(folder.items, function(i, val) {
+      that.tree.push(val);
+    });
+    this.tree.splice(this.tree.indexOf(folder), 1);
+    if (this.activeFeed === folderName && folder.items.length > 0)
+      this.activeFeed = folder.items[0];
+    else if (this.activeFeed === folderName && this.tree.length > 0) {
+      if (typeof this.tree[0] === "string")
+        this.activeFeed === this.tree[0];
+      else 
+        this.activeFeed === this.tree[0].name;
+    }
+    else if (this.activeFeed === folderName)
+      this.activeFeed = "";
+    this.saveToStorage();
+    var that = this;
+    this.displayList(function() {
+      that.selectFeedOrFolder(that.activeFeed);
+    });
+  },
+  renameFolder: function(folderName, newFolderName) {
+    var folder = this.getFolder(folderName);
+    folder.name = newFolderName;
+    this.ids[newFolderName] = this.ids[folderName];
+    delete this.ids[folderName];
+    $("#" + this.ids[newFolderName] + "-name").text(newFolderName);
+  },
+  unsubscribe: function(urlOrFolderName, showTree) {
+    if (urlOrFolderName in this.feeds) {
+      if (typeof showTree === "undefined")
+        showTree = true;
+      this.feeds[urlOrFolderName].removeFromStorage();
+      delete this.feeds[urlOrFolderName];
+      this.saveToStorage();
+      var that = this;
+      $.each(this.tree, function(i, val) {
+        if (typeof val !== "string" && val.items.indexOf(urlOrFolderName) >= 0) {
+          val.items.splice(val.items.indexOf(urlOrFolderName), 1);
+        }
+      });
+      if  (this.tree.indexOf(urlOrFolderName) >= 0) {
+        this.tree.splice(this.tree.indexOf(urlOrFolderName), 1);
+      }
+      if (this.activeFeed === urlOrFolderName && this.tree.length > 0) {
+        if (typeof this.tree[0] === "string")
+          this.activeFeed === this.tree[0];
+        else 
+          this.activeFeed === this.tree[0].name;
+      } else {
+        this.activeFeed = "";
+      }
+      if (showTree)
+        this.displayTree(function() { that.selectFeedOrFolder( that.activeFeed ); });
+    } else {
+      var folder = this.getFolder(urlOrFolderName);
+      while (folder.items.length > 0) {
+        this.unsubscribe(folder.items[0], false);
+      }
+      this.displayList(function() { that.calcAllFoldersUnread(); that.selectFeedOrFolder( that.activeFeed ); });
+    }
+  },
+  displayList: function(callback) {
+    $("#btnShowReadItems").html(reader.templates.btnShowReadItemsCaption(
+        {'isShowReadItems': this.isShowReadItems}));
+    this.ids = {};
+    $("#feedList").empty();
+    if (this.tree.length === 0) {
+      $("#storyList").empty();
+      $("#storyList").append(reader.templates.newUserMessage);
+    } else {
+      var that = this;
+      var promises = [];
+      $.each(this.tree, function(i, val) {
+        var showFeed = function(feed, id, list_id) {
+          var link = $(reader.templates.feedItemInTree({'id': id, 'title': feed.title, 'unread': feed.unread}));
+          link.click(function(event) { reader.feedList.selectFeed(feed.url); });
+          $(list_id).append(link);
+          that.ids[feed.url] = id;
+        };
+        var getAndShowFeed = function(url, id, list_id, folder) {
+          var feed = that.feeds[url];
+          if (typeof feed === "undefined" || feed === null || Object.keys(feed.items).length === 0) {
+            if (typeof feed === "undefined" || feed === null) {
+              feed = new ReaderFeed(url);
+            }
+            promises.push(feed.loadFromStorage(function() { showFeed(feed, id, list_id); feed.folder = folder }));
+            that.feeds[url] = feed;
+          } else {
+            showFeed(feed, id, list_id);
+          }
+        };
+        if (typeof val === "string") {  //val is a feed
+          getAndShowFeed(val, "list-" + i, "#feedList", null);
+        } else {   //val is a folder
+          var id = "list-" + i;
+          that.renderFolder(val, i);
+          $.each(val.items, function(j, val2) {
+            getAndShowFeed(val2, "list-" + i + "-" + j, "#sublist-" + i, val.name);
+          });
+          if (!val.isOpen) 
+            $("#sublist-" + i).hide();
+        }
+      });
+      $.when.apply(null, promises).then(function() { that.calcAllFoldersUnread(); callback(); });
+    }
+  },
+  sort: function(urlOrFolderName, order) {
+    if (urlOrFolderName in this.feeds) {
+      var feed = this.feeds[urlOrFolderName];
+      feed.order = order;
+      feed.saveToStorage();
+    } else {
+      var folder = this.getFolder(urlOrFolderName);
+      folder.order = order;
+      this.saveToStorage();
+    }
+    if (this.activeFeed === urlOrFolderName)
+      this.refresh();
   },
   selectFeedOrFolder: function(urlOrFolderName) {
     var that = this;
@@ -188,86 +329,17 @@ ReaderFeedList.prototype = {
     }
     $("#" + this.ids[folder]).css("font-weight", "bold");
     var itms = [];
-    var fld;
+    var fld = this.getFolder(folder);
     var that = this;
-    //console.log("Finding Folder", new Date());
-    $.each(this.tree, function(i, val) {
-      if ($.isPlainObject(val) && val.name === folder)
-        fld = val;
-    });
-    //console.log("Found Folder about to create items array", new Date());
     $.each(fld.items, function(i, feed) {
       for (var key in that.feeds[feed].items) {
         itms.push(that.feeds[feed].items[key]);
       }
     });
-    //console.log("created items array about to sort", new Date());
-    itms.sort(function(a, b) { return b.updated - a.updated; });
-    //console.log("items array sorted about to display " + itms.length, new Date());
+    itms.sort(function(a, b) { return fld.order * (b.updated - a.updated); });
     this.showItems(itms, true);
-    //console.log("displayed items", new Date());
     this.activeFeed = folder;
     this.saveToStorage();
-  },
-  displayList: function(callback) {
-    $("#btnShowReadItems").html(reader.templates.btnShowReadItemsCaption(
-        {'isShowReadItems': this.isShowReadItems}));
-    this.ids = {};
-    $("#feedList").empty();
-    if (this.tree.length === 0) {
-      $("#storyList").empty();
-      $("#storyList").append(reader.templates.newUserMessage);
-    } else {
-      var that = this;
-      var promises = [];
-      $.each(this.tree, function(i, val) {
-        var showFeed = function(feed, id, list_id) {
-          var link = $(reader.templates.feedItemInTree({'id': id, 'title': feed.title, 'unread': feed.unread}));
-          link.click(function(event) { reader.feedList.selectFeed(feed.url); });
-          $(list_id).append(link);
-          that.ids[feed.url] = id;
-        };
-        var getAndShowFeed = function(url, id, list_id, folder) {
-          var feed = that.feeds[url];
-          if (feed === null || Object.keys(feed.items).length === 0) {
-            if (feed === null) {
-              feed = new ReaderFeed(url);
-            }
-            promises.push(feed.loadFromStorage(function() { showFeed(feed, id, list_id); feed.folder = folder }));
-            that.feeds[url] = feed;
-          } else {
-            showFeed(feed, id, list_id);
-          }
-        };
-        if (typeof val === "string") {  //val is a feed
-          getAndShowFeed(val, "list-" + i, "#feedList", null);
-        } else {   //val is a folder
-          var id = "list-" + i;
-          var caret = $(reader.templates.folderCaret({'isOpen': val.isOpen}));
-          if (val.isOpen) {
-            caret.click(function(event) { reader.feedList.closeFolder(val.name); });
-          }
-          else {
-            caret.click(function(event) { reader.feedList.openFolder(val.name); });
-          }
-          var dropdown = $("#divFolderDropDown").clone().attr("id", "divFolderDropDown-" + i).addClass("pull-right");
-          dropdown.prepend($(reader.templates.folderDropdownTrigger({'i': i})));
-          var link = $(reader.templates.folderItemInTree({'id': id, 'folderName': val.name, 'unread': val.unread}));
-          $("a", link).click(function(event) { reader.feedList.selectFolder(val.name); });
-          link.hover(function(event) { $("#folderMenu-" + i).show(); },
-                     function(event) { $("#folderMenu-" + i).hide(); });
-          $("#feedList").append(link);
-          $("#" + id).prepend(dropdown).prepend(caret);
-          that.ids[val.name] = id;
-          $.each(val.items, function(j, val2) {
-            getAndShowFeed(val2, "list-" + i + "-" + j, "#sublist-" + i, val.name);
-          });
-          if (!val.isOpen) 
-            $("#sublist-" + i).hide();
-        }
-      });
-      $.when.apply(null, promises).then(function() { that.calcAllFoldersUnread(); callback(); });
-    }
   },
   calcAllFoldersUnread: function() {
     var that = this;
@@ -391,16 +463,18 @@ ReaderFeedList.prototype = {
   refresh: function() {
     this.selectFeedOrFolder(this.activeFeed);
   },
-  markAllRead: function() {
+  markAllRead: function(urlOrFolderName) {
+    if (typeof urlOrFolderName === "undefined")
+      urlOrFolderName = this.activeFeed;
     var that = this;
     $.each(this.tree, function(i, val) {
-      if (typeof val === "string" && val === that.activeFeed)
+      if (typeof val === "string" && val === urlOrFolderName)
         that.feeds[val].markAllRead();
-      else if (typeof val !== "string" && val.name === that.activeFeed) {
+      else if (typeof val !== "string" && val.name === urlOrFolderName) {
         $.each(val.items, function(j, url) {
           that.feeds[url].markAllRead();
         });
-        that.selectFolder(that.activeFeed);
+        that.selectFolder(urlOrFolderName);
       }
     });
     this.refresh();
@@ -419,6 +493,7 @@ function ReaderFeed(url) {
   this.nextUpdate = new Date();
   this.interval = 2;   //interval in minutes between updates
   this.isErrror = false;
+  this.order = 1;    //1 = sort by newest, -1 = sort by oldest
  }
 
 ReaderFeed.prototype = {
@@ -503,7 +578,8 @@ ReaderFeed.prototype = {
     for (var key in this.items) {
       itms.push(this.items[key]);
     }
-    itms.sort(function(a, b) { return b.updated - a.updated; });
+    var that = this;
+    itms.sort(function(a, b) { return that.order * (b.updated - a.updated); });
     reader.feedList.showItems(itms, false);
   },
   markAllRead: function() {
@@ -524,6 +600,7 @@ ReaderFeed.prototype = {
     obj.nextUpdate = this.nextUpdate;
     obj.interval = this.interval;
     obj.isError = this.isError;
+    obj.order = this.order;
     return obj;
   },
   saveToStorage: function() {
@@ -538,6 +615,21 @@ ReaderFeed.prototype = {
       //window.console && console.log('successfully wrote feed to db'); 
     };
     req.onerror = function() { window.console && console.log('failed to write feed to db'); };
+  },
+  removeFromStorage: function() {
+    var that = this;
+    //use a cursor here to delete all items from this feed
+    var trans = reader.db.transaction(['items','feeds'], 'readwrite');
+    var objectStore = trans.objectStore('items');
+    var feedIndex = objectStore.index("feed");
+    feedIndex.openCursor(IDBKeyRange.only(that.url)).onsuccess = function (event) {
+      var cursor = event.target.result;
+      if (cursor) {
+        cursor.delete();
+        cursor.continue();
+      } 
+    }; 
+    trans.objectStore('feeds').delete(this.url);
   },
   loadFromStorage: function(doneCallBack) {
     var that = this;
@@ -568,7 +660,7 @@ ReaderFeed.prototype = {
         feedIndex.openCursor(IDBKeyRange.only(that.url)).onsuccess = function (event) {
           var cursor = event.target.result;
           if (cursor) {
-            var itm = cursor.value
+            var itm = cursor.value;
             $.extend(itm, itm, reader.itemFunctions);
             that.items[itm.id] = itm;
             if (! itm.marked) {

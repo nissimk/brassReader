@@ -17,11 +17,12 @@ reader.templates = {
                              '<span id="<%= id %>-unread"> ( <%= unread %> )</span></a></li>'),
   
   folderItemInTree: _.template('<li id="<%= id %>"><a class="tree-item" href="#">' +
-                               '<i class="icon-folder-close"></i><%= folderName %>' +
+                               '<i class="icon-folder-close"></i><span id="<%= id %>-name">' +
+                               '<%= folderName %></span>' +
                                '<span id="<%= id %>-unread"> (<%= unread %>)</span>' +
                                '</a></li><ul class="nav nav-list" id="sub<%= id %>"></ul>'),
   
-  folderCaret: _.template('<div class="divlink"><i class="icon-caret-<% isOpen ? "down" : "right"%> ' +
+  folderCaret: _.template('<div class="divlink"><i class="icon-caret-<%= isOpen ? "down" : "right"%> ' +
                           'folder-open-close"></i></div>'),
 
   folderDropdownTrigger: _.template('<div class="divlink pull-left dropdown-toggle folder-dropdown"' +
@@ -30,7 +31,7 @@ reader.templates = {
   
   itemRowOpen: _.template('<tr class="openItemRow"><td colspan=<%= colspan %> class="openItemCell">' +
                           '<div class="itemContent"><h4><a href="<%= link %>"><%= title %></a></h4>' + 
-                          '<%= description></div></td></tr>'),
+                          '<%= description %></div></td></tr>'),
 
   itemRowClosed: _.template('<tr class="item" id="item-<%= itemId %>"></tr>'),
   feedTitleCell: _.template('<td class="itemFeedName"><%= title %></td>'),

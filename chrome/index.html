@@ -94,6 +94,22 @@
         <a href="#" class="btn btn-primary" id="btnSaveFolder">Save changes</a>
       </div>
     </div>
+    <div class="modal hide fade" id="modalRenameFolder">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h3>Rename Folder</h3>
+      </div>
+      <div class="modal-body">
+        <p>Enter New Folder Name</p>
+        <form name="frmNewFeed">
+          <input type="text" id="txtRenameFolder"></input>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <a href="#" class="btn" data-dismiss="modal">Cancel</a>
+        <a href="#" class="btn btn-primary" id="btnRenameFolder">Save changes</a>
+      </div>
+    </div>
     <div class="modal hide fade" id="modalImportOpml">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
@@ -136,12 +152,13 @@
     </div>
     <div class="dropdown" id="divFolderDropDown">
       <ul id="ulFolderDropDown" class="dropdown-menu" role="menu">
-        <li><a href="#">Sort by Oldest</a></li>
-        <li><a href="#">Sort by Newest</a></li>
+        <li><a href="#" id="mnuSortByOldest">Sort by Oldest</a></li>
+        <li><a href="#" id="mnuSortByNewest">Sort by Newest</a></li>
         <li class="divider"></li>
-        <li><a href="#">Rename Folder</a></li>
-        <li><a href="#">Delete Folder</a></li>
-        <li><a href="#">Unsubscribe All</a></li>
+        <li><a href="#" id="mnuMarkAllRead">Mark All Read</a></li>
+        <li><a href="#" id="mnuRenameFolder">Rename Folder</a></li>
+        <li><a href="#" id="mnuDeleteFolder">Delete Folder</a></li>
+        <li><a href="#" id="mnuUnsubscribeAll">Unsubscribe All</a></li>
       </ul>
     </div>
 </body>

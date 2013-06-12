@@ -57,6 +57,13 @@ reader.handlers = {
     var newFolder = $("#txtNewFolder").val();
     reader.feedList.addFolder(newFolder);
   },
+  renameFolder: function (oldFolderName) {
+    $("#modalRenameFolder").modal("show");
+    $("#btnRenameFolder").unbind("click").click(function(event) {
+      reader.feedList.renameFolder(oldFolderName, $("#txtRenameFolder").val());
+      $("#modalRenameFolder").modal("hide");
+    });
+  },
   importOpml: function importOpml(event) {
     $("#modalImportOpml").modal("hide");
     freader = new FileReader();
