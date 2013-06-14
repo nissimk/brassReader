@@ -4,15 +4,17 @@
   "description": "RSS Reader.",
   "version": "0.1",
   "icons": {
+    "16": "img/star-16.png",
     "48": "img/star-48.png",
     "128": "img/star.png"
   },
-  "app": {
-    "launch": {
-      "local_path": "index.html"
-    }
+  "browser_action": {
+    "default_icon": "img/star-16.png",
+    "default_title": "Brass Reader"
+  },
+  "background": {
+    "scripts": ["js/launch.js"]
   },
   "permissions": ["cookies", "http://*/*", "https://*/*", "storage", "unlimitedStorage"],
-  "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'",
   "offline_enabled": true
 }

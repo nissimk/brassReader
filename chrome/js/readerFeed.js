@@ -129,8 +129,7 @@ ReaderFeedList.prototype = {
     this.feeds[url] = newFeed;
     var that = this;
     newFeed.updateFeed(function(feed) {
-      $("#feedList").append(reader.templates.feedItemInTree(
-        {'id': id, 'title': feed.title, 'unread': feed.unread}));
+      $("#feedList").append(reader.templates.feedItemInTree(id, feed.title, feed.unread));
       that.selectFeed(url);
       that.saveToStorage();
     });
@@ -138,7 +137,7 @@ ReaderFeedList.prototype = {
   renderFolder: function(folder, i) {
     var id = "list-" + i;
     this.ids[folder.name] = id;
-    var caret = $(reader.templates.folderCaret({'isOpen': folder.isOpen}));
+    var caret = $(reader.templates.folderCaret(folder.isOpen));
     if (folder.isOpen) {
       caret.click(function(event) { reader.feedList.closeFolder(folder.name); });
     }
@@ -146,8 +145,8 @@ ReaderFeedList.prototype = {
       caret.click(function(event) { reader.feedList.openFolder(folder.name); });
     }
     var dropdown = $("#divFolderDropDown").clone().attr("id", "divFolderDropDown-" + i).addClass("pull-right");
-    dropdown.prepend($(reader.templates.folderDropdownTrigger({'i': i})));
-    var link = $(reader.templates.folderItemInTree({'id': id, 'folderName': folder.name, 'unread': folder.unread}));
+    dropdown.prepend($(reader.templates.folderDropdownTrigger(i)));
+    var link = $(reader.templates.folderItemInTree(id, folder.name, folder.unread));
     $("a", link).click(function(event) { reader.feedList.selectFolder(folder.name); });
     $("#feedList").append(link);
     $("#" + id).prepend(dropdown).prepend(caret)
@@ -233,8 +232,7 @@ ReaderFeedList.prototype = {
     }
   },
   displayList: function(callback) {
-    $("#btnShowReadItems").html(reader.templates.btnShowReadItemsCaption(
-        {'isShowReadItems': this.isShowReadItems}));
+    $("#btnShowReadItems").html(reader.templates.btnShowReadItemsCaption(this.isShowReadItem));
     this.ids = {};
     $("#feedList").empty();
     if (this.tree.length === 0) {
@@ -245,7 +243,7 @@ ReaderFeedList.prototype = {
       var promises = [];
       $.each(this.tree, function(i, val) {
         var showFeed = function(feed, id, list_id) {
-          var link = $(reader.templates.feedItemInTree({'id': id, 'title': feed.title, 'unread': feed.unread}));
+          var link = $(reader.templates.feedItemInTree(id, feed.title, feed.unread));
           link.click(function(event) { reader.feedList.selectFeed(feed.url); });
           $(list_id).append(link);
           that.ids[feed.url] = id;
@@ -374,9 +372,8 @@ ReaderFeedList.prototype = {
       reader.openItem.prev().removeClass("info");
       reader.openItem.remove();
     }
-    newRow = $(reader.templates.itemRowOpen(
-        {'colspan': row.children().length, 'link': item.link, 
-         'title': item.title, 'description': item.description} ));
+    newRow = $(reader.templates.itemRowOpen(row.children().length, item.link, 
+         item.title, item.description ));
     $("a", newRow).attr("target", "_blank");
     row.after(newRow);
     row.addClass("info");
@@ -402,19 +399,18 @@ ReaderFeedList.prototype = {
     $.each(items.slice(startAt), function(i, val) {
       var feed = that.feeds[val.feed];
       if (that.isShowReadItems || !val.marked) {
-        var row = $(reader.templates.itemRowClosed({'itemId': val.id}));
+        var row = $(reader.templates.itemRowClosed(val.id));
         row.click(function(event) { reader.feedList.openItem(val, row); });
         $("#storyList").append(row);
         if (isShowFeed) 
-          row.append(reader.templates.feedTitleCell({'title': feed.title}));
+          row.append(reader.templates.feedTitleCell(feed.title));
         var shortDesc = $("<div>" + val.description + "</div>").text().substring(0, 100);
         var titleClass = "itemTitleUnread";
         if (val.marked) {
           titleClass = "itemTitleRead";
         }
-        row.append(reader.templates.feedDescCell(
-          {'titleClass': titleClass, 'shortDesc': shortDesc, 'title': val.title}));
-        row.append(reader.templates.feedTimeCell({'dt': new Date(val.updated).toDateOrTimeStr()}));
+        row.append(reader.templates.feedDescCell(val.title, titleClass, shortDesc));
+        row.append(reader.templates.feedTimeCell(new Date(val.updated).toDateOrTimeStr()));
         if (rowCount++ === 42) {
           watcherRow = row;
         }

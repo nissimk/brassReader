@@ -19,5 +19,8 @@ Node actions:
 Error conditions
   shared storage is down but network is up
   network is down.
+  slave disconnects from network
+  master disconnects from network
+
 
 
