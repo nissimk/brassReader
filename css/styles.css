@@ -1,0 +1,42 @@
+body {
+  background-color: #f1a318;
+  color: #5f4d2f;
+}
+
+a {
+  color: #00f;
+}
+
+hr {
+  border-top: 1px solid #f1a318;
+  border-bottom: 1px solid #f1a318;
+}
+
+.navbar-inverse .brand, .navbar-inverse .nav>li>a {
+  color: #fbda06;
+}
+
+.navbar-inverse .nav>li>a:hover,
+.navbar-inverse .nav>li>a:focus,
+.navbar-inverse .brand:hover,
+.navbar-inverse .brand:focus {
+  color: #f1a318;
+}
+
+.navbar-inverse .navbar-inner {
+  background-color: #5f4d2f;
+  background-image: none;
+  color: #fbda06;
+}
+
+.navbar-inverse .nav .active>a,  
+.navbar-inverse .nav .active>a:focus,  
+.navbar-inverse .nav .active>a:hover,
+.hero-unit {
+  background-color: #91723c;
+  color: #fbda06;
+}
+
+.star {
+  padding: 3px;
+}
