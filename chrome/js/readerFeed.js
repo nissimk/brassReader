@@ -71,7 +71,15 @@ ReaderFeedList.prototype = {
         folder = val;
     });
     return folder;
-  }, 
+  },
+  getFolders: function() {  //return an array of folder names
+    var ret = [];
+    $.each(this.tree, function(i, val) {
+      if ($.isPlainObject(val))
+        ret.push(val.name);
+    });
+    return ret;
+  },
   importGReader: function() {
     var oldFeeds = this.feeds;
     this.tree = [];
@@ -121,15 +129,31 @@ ReaderFeedList.prototype = {
     obj.isShowReadItems = this.isShowReadItems;
     return obj;
   },
+  renderFeed: function(feed, id, list_id) {
+    var index = id.slice(5);  //strip off the list-
+    var link = $(reader.templates.feedItemInTree(id, feed.title, feed.unread));
+    link.click(function(event) { reader.feedList.selectFeed(feed.url); });
+    $(list_id).append(link);
+    var dropdown = $("#divFeedDropDown").clone().attr("id", "divFeedDropDown-" + index).addClass("pull-right");
+    dropdown.prepend($(reader.templates.feedDropdownTrigger(index)));
+    $("#" + id).prepend(dropdown)
+        .hover(function(event) { $("#feedMenu-" + index).show(); },
+               function(event) { $("#feedMenu-" + index).hide(); });
+    $("#" + id + " #mnuSortByOldest").click(function(event) { reader.feedList.sort(feed.url, -1); });
+    $("#" + id + " #mnuSortByNewest").click(function(event) { reader.feedList.sort(feed.url, 1); });
+    $("#" + id + " #mnuMoveToFolder").click(function(event) { reader.handlers.moveToFolder(feed.url); });
+    $("#" + id + " #mnuUnsubscribe").click(function(event) { reader.feedList.unsubscribe(feed.url); });
+    $("#" + id + " #mnuMarkAllRead").click(function(event) { reader.feedList.markAllRead(feed.url); });
+    this.ids[feed.url] = id;
+  }, 
   addFeed: function(url) {
     var newFeed = new ReaderFeed(url);
     var len = this.tree.push(url);
     var id = "list-" + String(len - 1);
-    this.ids[url] = id;
     this.feeds[url] = newFeed;
     var that = this;
     newFeed.updateFeed(function(feed) {
-      $("#feedList").append(reader.templates.feedItemInTree(id, feed.title, feed.unread));
+      renderFeed(newFeed, id, "#feedList");
       that.selectFeed(url);
       that.saveToStorage();
     });
@@ -203,7 +227,6 @@ ReaderFeedList.prototype = {
         showTree = true;
       this.feeds[urlOrFolderName].removeFromStorage();
       delete this.feeds[urlOrFolderName];
-      this.saveToStorage();
       var that = this;
       $.each(this.tree, function(i, val) {
         if (typeof val !== "string" && val.items.indexOf(urlOrFolderName) >= 0) {
@@ -213,6 +236,7 @@ ReaderFeedList.prototype = {
       if  (this.tree.indexOf(urlOrFolderName) >= 0) {
         this.tree.splice(this.tree.indexOf(urlOrFolderName), 1);
       }
+      this.saveToStorage();
       if (this.activeFeed === urlOrFolderName && this.tree.length > 0) {
         if (typeof this.tree[0] === "string")
           this.activeFeed === this.tree[0];
@@ -222,7 +246,7 @@ ReaderFeedList.prototype = {
         this.activeFeed = "";
       }
       if (showTree)
-        this.displayTree(function() { that.selectFeedOrFolder( that.activeFeed ); });
+        this.displayList(function() { that.selectFeedOrFolder( that.activeFeed ); });
     } else {
       var folder = this.getFolder(urlOrFolderName);
       while (folder.items.length > 0) {
@@ -242,22 +266,16 @@ ReaderFeedList.prototype = {
       var that = this;
       var promises = [];
       $.each(this.tree, function(i, val) {
-        var showFeed = function(feed, id, list_id) {
-          var link = $(reader.templates.feedItemInTree(id, feed.title, feed.unread));
-          link.click(function(event) { reader.feedList.selectFeed(feed.url); });
-          $(list_id).append(link);
-          that.ids[feed.url] = id;
-        };
         var getAndShowFeed = function(url, id, list_id, folder) {
           var feed = that.feeds[url];
           if (typeof feed === "undefined" || feed === null || Object.keys(feed.items).length === 0) {
             if (typeof feed === "undefined" || feed === null) {
               feed = new ReaderFeed(url);
             }
-            promises.push(feed.loadFromStorage(function() { showFeed(feed, id, list_id); feed.folder = folder }));
+            promises.push(feed.loadFromStorage(function() { that.renderFeed(feed, id, list_id); feed.folder = folder }));
             that.feeds[url] = feed;
           } else {
-            showFeed(feed, id, list_id);
+            that.renderFeed(feed, id, list_id);
           }
         };
         if (typeof val === "string") {  //val is a feed
@@ -272,7 +290,10 @@ ReaderFeedList.prototype = {
             $("#sublist-" + i).hide();
         }
       });
-      $.when.apply(null, promises).then(function() { that.calcAllFoldersUnread(); callback(); });
+      $.when.apply(null, promises).then(function() { 
+        that.calcAllFoldersUnread(); 
+        if ($.isFunction(callback)) { callback(); }
+      });
     }
   },
   sort: function(urlOrFolderName, order) {
@@ -456,6 +477,33 @@ ReaderFeedList.prototype = {
     caret.parent().unbind('click').click(function(event) { reader.feedList.openFolder(folder); });
     this.saveToStorage();
   },
+  moveToFolder: function(url, folderName) {
+    var folder = this.getFolder(folderName);
+    var feed = this.feeds[url];
+    var that = this;
+    //remove feed from anywhere else in the tree
+    $.each(this.tree, function(i, val) {
+      if ($.isPlainObject(val)) {
+        $.each(val.items, function(j, val2) {
+          if (val2 == url)
+            val.items.splice(j, 1);
+        });
+      } else {
+        if (val == url)
+          that.tree.splice(i, 1);
+      }
+    });
+    if (folder == null) {
+      feed.folder = null;
+      this.tree.push(url);
+    } else {
+      feed.folder = folderName;
+      folder.items.push(url);
+    }
+    feed.saveToStorage();
+    this.saveToStorage();
+    this.displayList(function() { that.calcAllFoldersUnread(); });
+  }, 
   refresh: function() {
     this.selectFeedOrFolder(this.activeFeed);
   },

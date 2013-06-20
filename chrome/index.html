@@ -125,6 +125,22 @@
         <a href="#" class="btn btn-primary" id="btnImportOpml">Import</a>
       </div>
     </div>
+    <div class="modal hide fade" id="modalMoveToFolder">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h3>Move To Folder</h3>
+      </div>
+      <div class="modal-body">
+        <p>Select Folder:</p>
+        <form name="frmNewFeed">
+          <select id="selNewFolder"></select>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <a href="#" class="btn" id="btnCancelMoveToFolder" data-dismiss="modal">Cancel</a>
+        <a href="#" class="btn btn-primary" id="btnMoveToFolder">Move</a>
+      </div>
+    </div>
     <div class="modal hide fade" id="modalSettings">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
@@ -158,6 +174,16 @@
         <li><a href="#" id="mnuRenameFolder">Rename Folder</a></li>
         <li><a href="#" id="mnuDeleteFolder">Delete Folder</a></li>
         <li><a href="#" id="mnuUnsubscribeAll">Unsubscribe All</a></li>
+      </ul>
+    </div>
+    <div class="dropdown" id="divFeedDropDown">
+      <ul id="ulFeedDropDown" class="dropdown-menu" role="menu">
+        <li><a href="#" id="mnuSortByOldest">Sort by Oldest</a></li>
+        <li><a href="#" id="mnuSortByNewest">Sort by Newest</a></li>
+        <li class="divider"></li>
+        <li><a href="#" id="mnuMarkAllRead">Mark All Read</a></li>
+        <li><a href="#" id="mnuMoveToFolder">Move to Folder...</a></li>
+        <li><a href="#" id="mnuUnsubscribe">Unsubscribe</a></li>
       </ul>
     </div>
 </body>

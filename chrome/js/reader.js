@@ -64,6 +64,18 @@ reader.handlers = {
       $("#modalRenameFolder").modal("hide");
     });
   },
+  moveToFolder: function (url) {
+    $("#modalMoveToFolder").modal("show");
+    $("#selNewFolder").empty();
+    $("#selNewFolder").append('<option value="">&lt;&lt; Top &gt;&gt;</option>');
+    $.each(reader.feedList.getFolders(), function(i, val) {
+      $("#selNewFolder").append('<option value="' + val + '">' + val + '</option>');
+    });
+    $("#btnMoveToFolder").unbind("click").click(function(event) {
+      reader.feedList.moveToFolder(url, $("#selNewFolder").val());
+      $("#modalMoveToFolder").modal("hide");
+    });
+  },
   importOpml: function importOpml(event) {
     $("#modalImportOpml").modal("hide");
     freader = new FileReader();

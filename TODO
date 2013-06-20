@@ -1,46 +1,12 @@
-* Fix date formatting of updated in displayFeed
-* Write function to display first n characters of description When showing it in the item list
-* make left hand items links and implement event
-* Add functions to item when loading it from the db
-* Expand item -- make right hand items links and implement event
-*  -make links blue again in right table.. only black in left list
-*  -show h3 with link in item td
-*  -control content width in item td
-*  -highlight open row with class
-*  -use class to denote read vs unread items bold and unbold
-* import opml
-*  -include fontawesome
-*  -change button to 3 buttons -- add feed, add folder and import opml
-* display feed folder  -- only display feed title in folder view -- in single feed view omit the feed name from each item.
-* open/close folder
-* timer to get feeds  -- 
-* import feedlist from reader API
-* display only first n items, display more when scrolling
-*  - when showing items save the items array in feedList
-*  - only show 50 at a time
-*  - add parameter to showItems startAt default to 0
-*  - if there are more than startAt + 50 rows:
-*    - add scrollMonitor to 42nd row call showItems with saved item list and startAt + 50.
-*  - when displaying feed or folder clear out the scrollMonitor before creating the items list.
-* folder unread count
-*  - add folder to feed.
-*  - add unread to folder object in tree
-*  - calculate unread for all folders after all feeds load
-*  - modify folder unread when modifying feed unread
-*  - add unread to folder display
-*  - update folder unread display when modifying folder unread
 right side buttons:
 *  -display all or just unread
 *  -mark all read
   -sort newest / oldest
-  -feed settings show menu from feed list
-* reclick feed / folder when already in it
-* throttling of feed querying
-*  - add interval to feed, start at 2 minutes
-*  - if feed returns no new items double interval unless interval = 256
-*  - if feed returns new items, halve interval unless interval = 2
-*  - save interval and save next update time = now + interval minutes
-*  -when updating feeds, only choose feeds that have next update < now.
+  -feed/folder settings show menu from feed/folder list
+  -expanded/list view
+keyboard bindings
+Show No unread items alert in the item list when isShowReadItems false and new item count = 0
+syncing system
 better error handling on feed update
 *  -400 - 405 set is Error to true in the feed.
 *  -same for parseError
@@ -52,25 +18,10 @@ better error handling on feed update
     -categorize under cannot find and feeds may have moved.
     -have textbox to enter new feed url
   -When updating all feeds -- if everything fails we are offline.  reduce refresh frequency and alert user
-* Add folder button
 make scrollbars skinny
-keyboard bindings
-feedlist menus:
-  feed:
-    move to folder >
-    mark all read
-    unsubscribe
-    sort by newest
-    sort by oldesd
-  folder: 
-    mark all read
-    unsubscribe all
 Drag and drop feedlist items
-* Start screen put instructions when feedlist is empty
-Show No unread items alert in the item list when isShowReadItems false and new item count = 0
 get favicons save and display in feedList
 /i view subscriptions and feeds for phone size screen
-syncing system
 firefox extension
 android app
 
