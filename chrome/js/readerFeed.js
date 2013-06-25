@@ -50,11 +50,13 @@ ReaderFeedList.prototype = {
     var that = this;
     $.each($("body > outline", opml), function(i, val) {
       if (val.childNodes.length === 0) {
-        that.tree.push(that.addFeedForImport(val.attributes.xmlUrl.value, oldFeeds, val.attributes.title.value));
+        if ("attributes" in val && val.attributes !== null) {
+          that.tree.push(that.addFeedForImport(val.attributes.xmlUrl.value, oldFeeds, val.attributes.title.value));
+        }
       } else {
         var folder = {name: val.attributes.title.value, isOpen: true, items: [], unread: 0, order: 1};
         $.each(val.childNodes, function(j, val2) {
-          if (val2.attributes !== null) {
+          if ("attributes" in val2 && val2.attributes !== null) {
             folder.items.push(that.addFeedForImport(val2.attributes.xmlUrl.value, oldFeeds, val2.attributes.title.value));
           }
         });
@@ -141,7 +143,8 @@ ReaderFeedList.prototype = {
                function(event) { $("#feedMenu-" + index).hide(); });
     $("#" + id + " #mnuSortByOldest").click(function(event) { reader.feedList.sort(feed.url, -1); });
     $("#" + id + " #mnuSortByNewest").click(function(event) { reader.feedList.sort(feed.url, 1); });
-    $("#" + id + " #mnuMoveToFolder").click(function(event) { reader.handlers.moveToFolder(feed.url); });
+    $("#" + id + " #mnuRenameFeed").click(function(event) { reader.handlers.renameFeed(feed.url); });
+    $("#" + id + " #mnuMoveTolder").click(function(event) { reader.handlers.moveToFolder(feed.url); });
     $("#" + id + " #mnuUnsubscribe").click(function(event) { reader.feedList.unsubscribe(feed.url); });
     $("#" + id + " #mnuMarkAllRead").click(function(event) { reader.feedList.markAllRead(feed.url); });
     this.ids[feed.url] = id;
@@ -153,7 +156,7 @@ ReaderFeedList.prototype = {
     this.feeds[url] = newFeed;
     var that = this;
     newFeed.updateFeed(function(feed) {
-      renderFeed(newFeed, id, "#feedList");
+      that.renderFeed(newFeed, id, "#feedList");
       that.selectFeed(url);
       that.saveToStorage();
     });
@@ -186,7 +189,7 @@ ReaderFeedList.prototype = {
   },
   addFolder: function(folderName) {
     var folder = {name: folderName, items: [], isOpen: true, unread: 0, order: 1};
-    var len = this.tree.push(folderName);
+    var len = this.tree.push(folder);
     var i = len - 1;
     this.renderFolder(folder, i);
     this.saveToStorage();
@@ -220,6 +223,15 @@ ReaderFeedList.prototype = {
     this.ids[newFolderName] = this.ids[folderName];
     delete this.ids[folderName];
     $("#" + this.ids[newFolderName] + "-name").text(newFolderName);
+    if (this.activeFeed === folderName)
+      this.activeFeed = newFolderName;
+    this.saveToStorage();
+  },
+  renameFeed: function(feedUrl, newFeedName) {
+    var feed = this.feeds[feedUrl];
+    feed.title = newFeedName;
+    $("#" + this.ids[feedUrl] + "-name").text(newFeedName);
+    feed.saveToStorage();
   },
   unsubscribe: function(urlOrFolderName, showTree) {
     if (urlOrFolderName in this.feeds) {

@@ -16,12 +16,13 @@ reader.templates = {
             '  items <span class="icon-caret-down"></span>'; 
   },
   feedItemInTree: function(id, title, unread) {
-    return '<li id="' + id + '"><a class="tree-item" href="#">' + title + 
+    return '<li id="' + id + '"><a class="tree-item" href="#">' + 
+           '<span id="' + id + '-name">' + title + '</span>' +
            '<span id="' + id + '-unread"> ( ' +  unread + ' )</span></a></li>'; 
   },
   folderItemInTree: function(id, folderName, unread) {
     return '<li id="' +  id + '"><a class="tree-item" href="#">' +
-           '<i class="icon-folder-close"></i><span id="' + id + '>-name">' +
+           '<i class="icon-folder-close"></i><span id="' + id + '-name">' +
            folderName + '</span><span id="' + id + '-unread"> ( ' +
            unread + ' )</span></a></li><ul class="nav nav-list" id="sub' + 
            id + '"></ul>'; 

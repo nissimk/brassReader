@@ -35,6 +35,16 @@
           </div>
           <a class="btn" id="btnMarkAllRead">Mark all read</a>
           <div class="pull-right">
+            <!--
+            <div class="btn-group">
+              <a class="btn" id="btnViewList" title="List View"><i class="icon-align-justify"></i></a>
+              <a class="btn" id="btnViewExpanded" title="Expanded View"><i class="icon-list"></i></a>
+            </div>
+            -->
+            <div class="btn-group">
+              <a class="btn" id="btnSortByNewest" title="Sort by newest"><i class="icon-chevron-sign-down"></i></a>
+              <a class="btn" id="btnSortByOldest" title="Sort by oldest"><i class="icon-chevron-sign-up"></i></a>
+            </div>
             <a class="btn" id="btnSettings" title="Settings" data-toggle="modal" data-target="#modalSettings"><i class="icon-cogs"></i></a>
           </div>
         </div>
@@ -44,11 +54,11 @@
           <!--Sidebar content-->
           <form name="frmSidebar">
             <div class="btn-group">
-              <a class="btn" href="#" title="Add Feed" data-toggle="modal" data-target="#modalAddFeed"><i class="icon-rss"></i></a>
-              <a class="btn" href="#" title="Add Folder" data-toggle="modal" data-target="#modalAddFolder"><i class="icon-folder-close"></i></a>
+              <a class="btn" href="#" title="Add Feed" id="btnAddFeed"><i class="icon-rss"></i></a>
+              <a class="btn" href="#" title="Add Folder" id="btnAddFolder"><i class="icon-folder-close"></i></a>
               <a class="btn" href="#" title="Import feeds from Google Reader" id="btnImportGReader">
                 <i class="icon-cloud-download"></i></a>
-              <a class="btn" href="#" title="Import OPML" data-toggle="modal" data-target="#modalImportOpml"><i class="icon-briefcase"></i></a>
+              <a class="btn" href="#" title="Import OPML" id="btnImportOpml"><i class="icon-briefcase"></i></a>
             </div>
           </form>
           <ul class="nav nav-list" id="feedList">
@@ -61,84 +71,22 @@
         </div>
       </div>
     </div>
-    <div class="modal hide fade" id="modalAddFeed">
+    <div class="modal hide fade" id="modalWindow">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-        <h3>Add Feed</h3>
+        <h3 id="modalHeader">Add Feed</h3>
       </div>
       <div class="modal-body">
-        <p>Paste feed URL here</p>
+        <p id="modalLabel">Paste feed URL here</p>
         <form name="frmNewFeed">
-          <input type="text" id="txtNewFeed"></input>
+          <input type="text" id="txtModal" class="span7"></input>
+          <input type="file" id="fileModal" class="span7"></input>
+          <select id="selModal" class="span7"></select>
         </form>
       </div>
       <div class="modal-footer">
         <a href="#" class="btn" data-dismiss="modal">Cancel</a>
-        <a href="#" class="btn btn-primary" id="btnSaveFeed">Save changes</a>
-      </div>
-    </div>
-    <div class="modal hide fade" id="modalAddFolder">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-        <h3>Add Folder</h3>
-      </div>
-      <div class="modal-body">
-        <p>Enter New Folder Name</p>
-        <form name="frmNewFeed">
-          <input type="text" id="txtNewFolder"></input>
-        </form>
-      </div>
-      <div class="modal-footer">
-        <a href="#" class="btn" data-dismiss="modal">Cancel</a>
-        <a href="#" class="btn btn-primary" id="btnSaveFolder">Save changes</a>
-      </div>
-    </div>
-    <div class="modal hide fade" id="modalRenameFolder">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-        <h3>Rename Folder</h3>
-      </div>
-      <div class="modal-body">
-        <p>Enter New Folder Name</p>
-        <form name="frmNewFeed">
-          <input type="text" id="txtRenameFolder"></input>
-        </form>
-      </div>
-      <div class="modal-footer">
-        <a href="#" class="btn" data-dismiss="modal">Cancel</a>
-        <a href="#" class="btn btn-primary" id="btnRenameFolder">Save changes</a>
-      </div>
-    </div>
-    <div class="modal hide fade" id="modalImportOpml">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-        <h3>Import OPML</h3>
-      </div>
-      <div class="modal-body">
-        <p>Select File:</p>
-        <form name="frmNewFeed">
-          <input type="file" id="txtOpmlFile"></input>
-        </form>
-      </div>
-      <div class="modal-footer">
-        <a href="#" class="btn" id="btnCancelAddFeed" data-dismiss="modal">Cancel</a>
-        <a href="#" class="btn btn-primary" id="btnImportOpml">Import</a>
-      </div>
-    </div>
-    <div class="modal hide fade" id="modalMoveToFolder">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-        <h3>Move To Folder</h3>
-      </div>
-      <div class="modal-body">
-        <p>Select Folder:</p>
-        <form name="frmNewFeed">
-          <select id="selNewFolder"></select>
-        </form>
-      </div>
-      <div class="modal-footer">
-        <a href="#" class="btn" id="btnCancelMoveToFolder" data-dismiss="modal">Cancel</a>
-        <a href="#" class="btn btn-primary" id="btnMoveToFolder">Move</a>
+        <a href="#" class="btn btn-primary" id="btnModalOK">Save changes</a>
       </div>
     </div>
     <div class="modal hide fade" id="modalSettings">
@@ -182,6 +130,7 @@
         <li><a href="#" id="mnuSortByNewest">Sort by Newest</a></li>
         <li class="divider"></li>
         <li><a href="#" id="mnuMarkAllRead">Mark All Read</a></li>
+        <li><a href="#" id="mnuRenameFeed">Rename Feed</a></li>
         <li><a href="#" id="mnuMoveToFolder">Move to Folder...</a></li>
         <li><a href="#" id="mnuUnsubscribe">Unsubscribe</a></li>
       </ul>

@@ -46,59 +46,140 @@ reader.request.onsuccess = function(event) {
   reader.feedList.loadFromStorage();
 };
 
+reader.showModal = function(options) {
+  $("#modalHeader").text(options.header);
+  $("#modalLabel").text(options.label);
+  $("#btnModalOK").text(options.okButton).unbind("click").click(options.okClick);
+  $("#txtModal, #selModal, #fileModal").hide();
+  if (options.showText) {
+    $("#txtModal").show();
+  } else if (options.showFile) {
+    $("#fileModal").show();
+  } else if (options.showSelect) {
+    $("#selModal").show();
+  }
+  $("#modalWindow").modal("show");
+  if ("text" in options) {
+    $("#txtModal").val(options.text);
+  } else {
+    $("#txtModal").val("");
+  }
+  $("#modalWindow").on('shown', function() { 
+    if (options.showText) {
+      $("#txtModal").focus().select();
+    } else if (options.showFile) {
+      $("#fileModal").focus();
+    } else if (options.showSelect) {
+      $("#selModal").focus();
+    }
+  });
+};
+
 reader.handlers = {
   addFeed: function addFeed(event) {
-    $("#modalAddFeed").modal("hide");
-    var newFeed = $("#txtNewFeed").val();
+    $("#modalWindow").modal("hide");
+    var newFeed = $("#txtModal").val();
     reader.feedList.addFeed(newFeed);
   },
   addFolder: function addFolder(event) {
-    $("#modalAddFolder").modal("hide");
-    var newFolder = $("#txtNewFolder").val();
+    $("#modalWindow").modal("hide");
+    var newFolder = $("#txtModal").val();
     reader.feedList.addFolder(newFolder);
   },
   renameFolder: function (oldFolderName) {
-    $("#modalRenameFolder").modal("show");
-    $("#btnRenameFolder").unbind("click").click(function(event) {
-      reader.feedList.renameFolder(oldFolderName, $("#txtRenameFolder").val());
-      $("#modalRenameFolder").modal("hide");
+    reader.showModal({
+      header: "Rename Folder", 
+      label: "New Folder Name:", 
+      okButton: "Save Changes",
+      okClick: function() {
+        reader.feedList.renameFolder(oldFolderName, $("#txtModal").val());
+        $("#modalWindow").modal("hide");
+      },
+      showText: true
+    });
+  },
+  renameFeed: function (feedUrl) {
+    reader.showModal({
+      header: "Rename Feed", 
+      label: "New Feed Name:", 
+      okButton: "Save Changes",
+      text: reader.feedList.feeds[feedUrl].title,
+      okClick: function() {
+        reader.feedList.renameFeed(feedUrl, $("#txtModal").val());
+        $("#modalWindow").modal("hide");
+      },
+      showText: true
     });
   },
   moveToFolder: function (url) {
-    $("#modalMoveToFolder").modal("show");
-    $("#selNewFolder").empty();
-    $("#selNewFolder").append('<option value="">&lt;&lt; Top &gt;&gt;</option>');
+    reader.showModal({
+      header: "Move to Folder", 
+      label: "Select Folder:", 
+      okButton: "Move",
+      okClick: function() {
+        reader.feedList.moveToFolder(url, $("#selModal").val());
+        $("#modalWindow").modal("hide");
+      },
+      showSelect: true});
+    $("#selModal").empty();
+    $("#selModal").append('<option value="">&lt;&lt; Top &gt;&gt;</option>');
     $.each(reader.feedList.getFolders(), function(i, val) {
-      $("#selNewFolder").append('<option value="' + val + '">' + val + '</option>');
-    });
-    $("#btnMoveToFolder").unbind("click").click(function(event) {
-      reader.feedList.moveToFolder(url, $("#selNewFolder").val());
-      $("#modalMoveToFolder").modal("hide");
+      $("#selModal").append('<option value="' + val + '">' + val + '</option>');
     });
   },
   importOpml: function importOpml(event) {
-    $("#modalImportOpml").modal("hide");
+    $("#modalWindow").modal("hide");
     freader = new FileReader();
     freader.onload = function(e) {
       opml = $.parseXML(e.target.result);
       //reader.opml = opml;
       reader.feedList.loadFromOPML(opml);
     }
-    freader.readAsText($("#txtOpmlFile").get()[0].files[0]);
+    freader.readAsText($("#fileModal").get()[0].files[0]);
+  },
+  sort: function (event) {
+    var order = 1;
+    if (event.target.id === "btnSortByOldest")
+      order = -1;
+    reader.feedList.sort(reader.feedList.activeFeed, order);
   }
 };
 
 $(document).ready(function() {
-  $("#btnSaveFeed").click(reader.handlers.addFeed);
-  $("#btnSaveFolder").click(reader.handlers.addFolder);
-  $("#btnImportOpml").click(reader.handlers.importOpml);
-  $("#btnImportGReader").click(function() { reader.feedList.importGReader(); });
+  $("#btnAddFeed").click(function() { 
+    reader.showModal({
+      header: "Add Feed", 
+      label: "Past feed URL here", 
+      okButton: "Save Changes",
+      okClick: reader.handlers.addFeed,
+      showText: true});
+  });
+
+  $("#btnAddFolder").click(function() { 
+    reader.showModal({
+      header: "Add Folder", 
+      label: "Enter new folder name", 
+      okButton: "Save Changes",
+      okClick: reader.handlers.addFolder,
+      showText: true});
+  });
+
+  $("#btnImportOpml").click(function() { 
+    reader.showModal({
+      header: "Import OPML", 
+      label: "Select File", 
+      okButton: "Import",
+      okClick: reader.handlers.importOpml,
+      showFile: true});
+  });
+
   $("#btnRefresh").click(function() { reader.feedList.refresh(); });
   $("#btnClearDB").click(function() { 
     indexedDB.deleteDatabase("BrassReader");
     reader.feedList = new ReaderFeedList();
     reader.feedList.displayList();
   });
+  $("#btnSortByNewest, #btnSortByOldest").click(reader.handlers.sort);
   // Fluid layout doesn't seem to support 100% height; manually set it
   $(window).resize(function() {
     var h = $(window).height() - $("#top-nav").height();
