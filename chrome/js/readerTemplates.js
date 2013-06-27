@@ -42,6 +42,12 @@ reader.templates = {
            ' data-toggle="dropdown" data-target="#" id="feedMenu-' + i + '">' + 
            '<i class="icon-caret-down"></i></div>';
   },
+  folderDropdownButton: '<a class="btn dropdown-toggle" data-toggle="dropdown" ' +
+                            'data-target="#" id="btnFolderDrop">Folder Options ' +
+                          '<span class="icon-caret-down"></span></a>',
+  feedDropdownButton: '<a class="btn dropdown-toggle" data-toggle="dropdown" ' +
+                            'data-target="#" id="btnFeedDrop">Feed Options ' +
+                          '<span class="icon-caret-down"></span></a>',
   itemRowOpen: function(colspan, link, title, description) {
     return '<tr class="openItemRow"><td colspan=' + colspan + ' class="openItemCell">' +
            '<div class="itemContent"><h4><a href="' + link + '">' + title + '</a></h4>' + 

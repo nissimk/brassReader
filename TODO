@@ -1,10 +1,9 @@
-Move all modal functionality to hidden form elements below button bar
-rename feed
+* rename feed
 right side buttons:
 *  -display all or just unread
 *  -mark all read
 *  -sort newest / oldest
-  -feed/folder settings show menu from feed/folder list
+*  -feed/folder settings show menu from feed/folder list
   -expanded/list view
 keyboard bindings
 Show No unread items alert in the item list when isShowReadItems false and new item count = 0

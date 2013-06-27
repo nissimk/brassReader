@@ -88,3 +88,8 @@ td.itemDateTime {
 div.itemContent {
   max-width: 650px;
 }
+
+div.dropdown-btn {
+  display: inline;
+}
+

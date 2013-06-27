@@ -15,6 +15,7 @@ ReaderFeedList.prototype = {
       var cursor = event.target.result;
       if (cursor) {
         var val = cursor.value;
+        that.activeFeed = val.activeFeed;
         that.isShowReadItems = val.isShowReadItems;
         that.tree = val.tree;
         var feeds = that.feeds;
@@ -131,6 +132,14 @@ ReaderFeedList.prototype = {
     obj.isShowReadItems = this.isShowReadItems;
     return obj;
   },
+  addFeedHandlers: function(id, feed) {
+    $("#" + id + " #mnuSortByOldest").click(function(event) { reader.feedList.sort(feed.url, -1); });
+    $("#" + id + " #mnuSortByNewest").click(function(event) { reader.feedList.sort(feed.url, 1); });
+    $("#" + id + " #mnuRenameFeed").click(function(event) { reader.handlers.renameFeed(feed.url); });
+    $("#" + id + " #mnuMoveToFolder").click(function(event) { reader.handlers.moveToFolder(feed.url); });
+    $("#" + id + " #mnuUnsubscribe").click(function(event) { reader.feedList.unsubscribe(feed.url); });
+    $("#" + id + " #mnuMarkAllRead").click(function(event) { reader.feedList.markAllRead(feed.url); });
+  },
   renderFeed: function(feed, id, list_id) {
     var index = id.slice(5);  //strip off the list-
     var link = $(reader.templates.feedItemInTree(id, feed.title, feed.unread));
@@ -141,12 +150,7 @@ ReaderFeedList.prototype = {
     $("#" + id).prepend(dropdown)
         .hover(function(event) { $("#feedMenu-" + index).show(); },
                function(event) { $("#feedMenu-" + index).hide(); });
-    $("#" + id + " #mnuSortByOldest").click(function(event) { reader.feedList.sort(feed.url, -1); });
-    $("#" + id + " #mnuSortByNewest").click(function(event) { reader.feedList.sort(feed.url, 1); });
-    $("#" + id + " #mnuRenameFeed").click(function(event) { reader.handlers.renameFeed(feed.url); });
-    $("#" + id + " #mnuMoveTolder").click(function(event) { reader.handlers.moveToFolder(feed.url); });
-    $("#" + id + " #mnuUnsubscribe").click(function(event) { reader.feedList.unsubscribe(feed.url); });
-    $("#" + id + " #mnuMarkAllRead").click(function(event) { reader.feedList.markAllRead(feed.url); });
+    this.addFeedHandlers(id, feed);
     this.ids[feed.url] = id;
   }, 
   addFeed: function(url) {
@@ -160,6 +164,14 @@ ReaderFeedList.prototype = {
       that.selectFeed(url);
       that.saveToStorage();
     });
+  },
+  addFolderHandlers: function(id, folder) {
+    $("#" + id + " #mnuSortByOldest").click(function(event) { reader.feedList.sort(folder.name, -1); });
+    $("#" + id + " #mnuSortByNewest").click(function(event) { reader.feedList.sort(folder.name, 1); });
+    $("#" + id + " #mnuRenameFolder").click(function(event) { reader.handlers.renameFolder(folder.name); });
+    $("#" + id + " #mnuDeleteFolder").click(function(event) { reader.feedList.deleteFolder(folder.name); });
+    $("#" + id + " #mnuUnsubscribeAll").click(function(event) { reader.feedList.unsubscribe(folder.name); });
+    $("#" + id + " #mnuMarkAllRead").click(function(event) { reader.feedList.markAllRead(folder.name); });
   },
   renderFolder: function(folder, i) {
     var id = "list-" + i;
@@ -179,12 +191,7 @@ ReaderFeedList.prototype = {
     $("#" + id).prepend(dropdown).prepend(caret)
         .hover(function(event) { $("#folderMenu-" + i).show(); },
                function(event) { $("#folderMenu-" + i).hide(); });
-    $("#" + id + " #mnuSortByOldest").click(function(event) { reader.feedList.sort(folder.name, -1); });
-    $("#" + id + " #mnuSortByNewest").click(function(event) { reader.feedList.sort(folder.name, 1); });
-    $("#" + id + " #mnuRenameFolder").click(function(event) { reader.handlers.renameFolder(folder.name); });
-    $("#" + id + " #mnuDeleteFolder").click(function(event) { reader.feedList.deleteFolder(folder.name); });
-    $("#" + id + " #mnuUnsubscribeAll").click(function(event) { reader.feedList.unsubscribe(folder.name); });
-    $("#" + id + " #mnuMarkAllRead").click(function(event) { reader.feedList.markAllRead(folder.name); });
+    this.addFolderHandlers(id, folder);
     return link;
   },
   addFolder: function(folderName) {
@@ -322,13 +329,10 @@ ReaderFeedList.prototype = {
       this.refresh();
   },
   selectFeedOrFolder: function(urlOrFolderName) {
-    var that = this;
-    $.each(this.tree, function(i, val) {
-      if (typeof val === "string" && val === urlOrFolderName)
-        that.selectFeed(urlOrFolderName);
-      else if (typeof val !== "string" && val.name === urlOrFolderName)
-        that.selectFolder(urlOrFolderName);
-    });
+    if (urlOrFolderName in this.feeds)
+      this.selectFeed(urlOrFolderName);
+    else if (urlOrFolderName in this.getFolders())
+      this.selectFolder(urlOrFolderName);
   },
   selectFeed: function(url) {
     if (this.activeFeed !== '') {
@@ -348,6 +352,12 @@ ReaderFeedList.prototype = {
       this.feeds[url].displayFeed();
     }
     this.activeFeed = url
+    var feedDrop = $("#divFeedDropDown").clone();
+    feedDrop.attr('id', 'divFeedDropDownBtn').addClass("dropdown-btn");
+    feedDrop.prepend(reader.templates.feedDropdownButton);
+    $("#spanFeedDrop").empty().append(feedDrop).show();
+    this.addFeedHandlers("spanFeedDrop", this.feeds[url]);
+    $("#spanFolderDrop").hide();
     this.saveToStorage();
   },
   selectFolder: function(folder) {
@@ -370,6 +380,12 @@ ReaderFeedList.prototype = {
     itms.sort(function(a, b) { return fld.order * (b.updated - a.updated); });
     this.showItems(itms, true);
     this.activeFeed = folder;
+    var folderDrop = $("#divFolderDropDown").clone();
+    folderDrop.attr('id', 'divFoderDropDownBtn').addClass("dropdown-btn");
+    folderDrop.prepend(reader.templates.folderDropdownButton);
+    $("#spanFolderDrop").empty().append(folderDrop).show();
+    this.addFolderHandlers("spanFolderDrop", fld);
+    $("#spanFeedDrop").hide();
     this.saveToStorage();
   },
   calcAllFoldersUnread: function() {
