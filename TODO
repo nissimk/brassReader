@@ -4,7 +4,14 @@ right side buttons:
 *  -mark all read
 *  -sort newest / oldest
 *  -feed/folder settings show menu from feed/folder list
-  -expanded/list view
+*  -expanded/list view
+*    -add boolean to feedList like isShowUnread
+*    -make buttons into radio buttons and set isExpandedView
+*    -change displayItems to behave differently if isExpandedView
+*      -don't show table rows, just open all items
+*      -add a scrollWatcher to each open item at the bottom that marks it as read
+* select correct view button in $ready
+* unread / all items button is reversed
 keyboard bindings
 Show No unread items alert in the item list when isShowReadItems false and new item count = 0
 syncing system

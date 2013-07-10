@@ -23,4 +23,6 @@ Error conditions
   master disconnects from network
 
 
+Can we use OPML as the feedlist and feeds?  Can we add extra attributes to each feed in opml?
+If so, then changeset would be OPML + New Items + marked + unmarked [marked and unmarked cannot contain the same id in one changeset]
 

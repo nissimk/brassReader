@@ -5,6 +5,7 @@ function ReaderFeedList() {
   this.ids = {};  //keys are url or folder name; value is string with html id of element in list
   this.timeout = null;
   this.isShowReadItems = true;
+  this.isExpandedView = false;
 }
 
 ReaderFeedList.prototype = {
@@ -17,6 +18,7 @@ ReaderFeedList.prototype = {
         var val = cursor.value;
         that.activeFeed = val.activeFeed;
         that.isShowReadItems = val.isShowReadItems;
+        that.isExpandedView = val.isExpandedView;
         that.tree = val.tree;
         var feeds = that.feeds;
         $.each(val.feeds, function(i, url) {
@@ -130,6 +132,7 @@ ReaderFeedList.prototype = {
     obj.tree = this.tree;
     obj.feeds = Object.keys(this.feeds);
     obj.isShowReadItems = this.isShowReadItems;
+    obj.isExpandedView = this.isExpandedView;
     return obj;
   },
   addFeedHandlers: function(id, feed) {
@@ -275,7 +278,9 @@ ReaderFeedList.prototype = {
     }
   },
   displayList: function(callback) {
-    $("#btnShowReadItems").html(reader.templates.btnShowReadItemsCaption(this.isShowReadItem));
+    $("#btnShowReadItems").html(reader.templates.btnShowReadItemsCaption(this.isShowReadItems));
+    $("#btnViewList, #btnViewExpanded").removeClass("active");
+    $("#btnView" + (this.isExpandedView ? "Expanded" : "List")).addClass("active");
     this.ids = {};
     $("#feedList").empty();
     if (this.tree.length === 0) {
@@ -331,10 +336,22 @@ ReaderFeedList.prototype = {
   selectFeedOrFolder: function(urlOrFolderName) {
     if (urlOrFolderName in this.feeds)
       this.selectFeed(urlOrFolderName);
-    else if (urlOrFolderName in this.getFolders())
+    else if (this.getFolders().indexOf(urlOrFolderName) >= 0)
       this.selectFolder(urlOrFolderName);
   },
+  clearWatchers: function() {
+    if (this.elementWatcher) {
+      this.elementWatcher.destroy;
+    }
+    if (this.expandedWatchers) {
+      $.each(this.expandedWatchers, function(i, val) {
+        val.destroy();
+      });
+    }
+    this.expandedWatchers = [];
+  },
   selectFeed: function(url) {
+    this.clearWatchers();
     if (this.activeFeed !== '') {
       oldActiveId = this.ids[this.activeFeed];
       $("#" + oldActiveId).css("font-weight", "normal");
@@ -361,9 +378,7 @@ ReaderFeedList.prototype = {
     this.saveToStorage();
   },
   selectFolder: function(folder) {
-    if (reader.feedList.elementWatcher) {
-      reader.feedList.elementWatcher.destroy;
-    }
+    this.clearWatchers();
     if (this.activeFeed !== '') {
       oldActiveId = this.ids[this.activeFeed];
       $("#" + oldActiveId).css("font-weight", "normal");
@@ -445,21 +460,37 @@ ReaderFeedList.prototype = {
     var that = this;
     var rowCount = 0;
     var watcherRow = null;
+    var expandedWatchers = [];
+    if (this.elementWatcher)
+      this.elementWatcher.destroy();
     $.each(items.slice(startAt), function(i, val) {
       var feed = that.feeds[val.feed];
       if (that.isShowReadItems || !val.marked) {
-        var row = $(reader.templates.itemRowClosed(val.id));
-        row.click(function(event) { reader.feedList.openItem(val, row); });
-        $("#storyList").append(row);
-        if (isShowFeed) 
-          row.append(reader.templates.feedTitleCell(feed.title));
-        var shortDesc = $("<div>" + val.description + "</div>").text().substring(0, 100);
-        var titleClass = "itemTitleUnread";
-        if (val.marked) {
-          titleClass = "itemTitleRead";
+        if (that.isExpandedView) {
+          var row = $(reader.templates.itemRowOpen(1, val.link, val.title, val.description ));
+          $("a", row).attr("target", "_blank");
+          var watcherDiv = $('<div class="scrollMon"></div>');
+          $(".openItemCell", row).append(watcherDiv);
+          $("#storyList").append(row);
+          var watcher = scrollMonitor.create(watcherDiv);
+          watcher.enterViewport(function() {
+            val.markRead();
+          });
+          expandedWatchers.push(watcher);
+        } else {
+          var row = $(reader.templates.itemRowClosed(val.id));
+          row.click(function(event) { reader.feedList.openItem(val, row); });
+          $("#storyList").append(row);
+          if (isShowFeed) 
+            row.append(reader.templates.feedTitleCell(feed.title));
+          var shortDesc = $("<div>" + val.description + "</div>").text().substring(0, 100);
+          var titleClass = "itemTitleUnread";
+          if (val.marked) {
+            titleClass = "itemTitleRead";
+          }
+          row.append(reader.templates.feedDescCell(val.title, titleClass, shortDesc));
+          row.append(reader.templates.feedTimeCell(new Date(val.updated).toDateOrTimeStr()));
         }
-        row.append(reader.templates.feedDescCell(val.title, titleClass, shortDesc));
-        row.append(reader.templates.feedTimeCell(new Date(val.updated).toDateOrTimeStr()));
         if (rowCount++ === 42) {
           watcherRow = row;
         }
@@ -470,16 +501,14 @@ ReaderFeedList.prototype = {
             that.elementWatcher.enterViewport(function() {
               reader.feedList.showItems(reader.feedList.feedItems, isShowFeed, startAt + 50);
             });
-            $(".right-section").unbind("scroll").scroll(function() { 
-              reader.feedList.elementWatcher.recalculateLocation(); 
-              scrollMonitor.update(); 
-            });
           }
           return false;    //break out of $.each
         }
       }
     });
-
+    if (! $.isArray(this.expandedWatchers))
+      this.expandedWatchers = [];
+    this.expandedWatchers = this.expandedWatchers.concat(expandedWatchers);
   },
   openFolder: function(folder) {
     var id = this.ids[folder];

@@ -180,10 +180,25 @@ $(document).ready(function() {
     reader.feedList.displayList();
   });
   $("#btnSortByNewest, #btnSortByOldest").click(reader.handlers.sort);
+  $("#btnViewList").click(function() {
+    reader.feedList.isExpandedView = false;
+    reader.feedList.refresh();
+  });
+  $("#btnViewExpanded").click(function() {
+    reader.feedList.isExpandedView = true;
+    reader.feedList.refresh();
+  });
   // Fluid layout doesn't seem to support 100% height; manually set it
   $(window).resize(function() {
     var h = $(window).height() - $("#top-nav").height();
     $('#left-section, #right-section').height(h);  
+  });
+  $(".right-section").scroll(function() { 
+    reader.feedList.elementWatcher.recalculateLocation(); 
+    $.each(reader.feedList.expandedWatchers, function(i, val) {
+      val.recalculateLocation();
+    });
+    scrollMonitor.update(); 
   });
   $(window).resize();
   $("#btnMarkAllRead").click(function() { reader.feedList.markAllRead(); });
